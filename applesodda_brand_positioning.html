@@ -1,0 +1,207 @@
+<h2 class="sr-only">applesodda trendguide 브랜드 포지셔닝 — 트렌드 상품 큐레이션 + 레시피 블로그</h2>
+<style>
+:root {
+  --ap-green:#3DA048;--ap-aqua:#1BBDB5;--ap-fizz:#B8E63C;
+  --ap-light:#F2FCF5;--ap-mist:#E0F7F0;--ap-deep:#1A3A22;
+  --ap-bubble:#D0F5EE;--ap-gm:#2F7A38;--ap-am:#148F89;
+  --cp:#E4393C;--ns:#03C75A;--mk:#5C2D91;
+}
+.wrap{padding:.75rem 0 1rem;}
+.lbl{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:12px;}
+.sec{margin-bottom:2rem;}
+hr.dv{border:none;border-top:.5px solid var(--color-border-tertiary);margin:0 0 2rem;}
+
+/* 포지셔닝 맵 */
+.pos-card{background:var(--ap-deep);border-radius:var(--border-radius-lg);padding:22px 24px;display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap;}
+.pos-logo{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.pos-mark{width:44px;height:44px;border-radius:11px;background:var(--ap-green);display:flex;align-items:center;justify-content:center;}
+.pos-name{font-size:22px;font-weight:500;color:white;font-family:var(--font-sans);line-height:1;}
+.pos-name em{color:var(--ap-fizz);font-style:normal;}
+.pos-divider{width:.5px;background:rgba(255,255,255,.15);align-self:stretch;margin:0 4px;}
+.pos-desc{flex:1;min-width:200px;}
+.pos-tagline{font-size:16px;font-weight:500;color:white;line-height:1.5;margin-bottom:6px;}
+.pos-tagline em{color:var(--ap-fizz);font-style:normal;}
+.pos-sub{font-size:12px;color:rgba(255,255,255,.5);line-height:1.6;}
+
+/* 콘텐츠 3기둥 */
+.pillar-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.pillar{border-radius:var(--border-radius-lg);padding:16px;border:.5px solid var(--color-border-tertiary);}
+.pillar-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;}
+.pillar-name{font-size:14px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px;}
+.pillar-desc{font-size:12px;color:var(--color-text-secondary);line-height:1.55;}
+.pillar-ex{font-size:11px;margin-top:8px;padding-top:8px;border-top:.5px solid var(--color-border-tertiary);color:var(--color-text-tertiary);line-height:1.6;}
+
+/* 플랫폼 뱃지 */
+.platform-row{display:flex;gap:8px;flex-wrap:wrap;}
+.plat{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--border-radius-md);font-size:13px;font-weight:500;}
+
+/* 콘텐츠 플로우 */
+.flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.flow-step{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 14px;flex:1;min-width:110px;}
+.flow-num{font-size:11px;font-weight:500;color:var(--ap-aqua);margin-bottom:3px;}
+.flow-title{font-size:13px;font-weight:500;color:var(--color-text-primary);}
+.flow-desc{font-size:11px;color:var(--color-text-secondary);margin-top:2px;line-height:1.5;}
+.flow-arrow{font-size:18px;color:var(--ap-fizz);flex-shrink:0;}
+
+/* 카테고리 */
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.cat-row{display:flex;align-items:center;justify-content:space-between;background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 14px;}
+.cat-left{display:flex;align-items:center;gap:8px;}
+.cat-dot{width:8px;height:8px;border-radius:50%;}
+.cat-n{font-size:13px;font-weight:500;color:var(--color-text-primary);}
+.cat-c{font-size:11px;color:var(--color-text-tertiary);}
+</style>
+
+<div class="wrap">
+
+  <div class="sec">
+    <div class="pos-card">
+      <div class="pos-logo">
+        <div class="pos-mark">
+          <svg width="26" height="28" viewBox="0 0 30 32" fill="none">
+            <path d="M15 1C15 1 8 7 8 13.5C8 17.5 11 21 15 21C19 21 22 17.5 22 13.5C22 7 15 1 15 1Z" fill="white" opacity="0.95"/>
+            <path d="M15 1C15 1 15 4 17.5 5.5" stroke="#B8E63C" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="22" cy="8" r="2" fill="#B8E63C"/>
+            <path d="M10 24H20" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <div class="pos-name"><em>trend</em>guide</div>
+          <div style="font-size:11px;color:rgba(184,230,60,.6);letter-spacing:.1em;margin-top:2px;">by applesodda</div>
+        </div>
+      </div>
+      <div class="pos-divider"></div>
+      <div class="pos-desc">
+        <p class="pos-tagline">지금 <em>가장 많이 팔리는</em> 그 상품,<br>집에서 이렇게 먹어요</p>
+        <p class="pos-sub">쿠팡 · 네이버쇼핑 · 마켓컬리 인기 상품 큐레이션 + 트렌드 분석 + 레시피</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="dv">
+
+  <div class="sec">
+    <p class="lbl">콘텐츠 3기둥</p>
+    <div class="pillar-grid">
+      <div class="pillar">
+        <div class="pillar-icon" style="background:#DFFAE3;">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M10 3L11.8 7.6L17 8.1L13.2 11.4L14.4 16.6L10 14L5.6 16.6L6.8 11.4L3 8.1L8.2 7.6L10 3Z" fill="#3DA048"/>
+          </svg>
+        </div>
+        <p class="pillar-name">트렌드 리포트</p>
+        <p class="pillar-desc">지금 뜨는 식재료·식품 트렌드를 데이터 기반으로 분석</p>
+        <p class="pillar-ex">예) "2025 여름 탄산음료 트렌드"<br>"요즘 Z세대가 먹는 것들"</p>
+      </div>
+      <div class="pillar">
+        <div class="pillar-icon" style="background:var(--ap-bubble);">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <rect x="3" y="6" width="14" height="11" rx="2.5" fill="#1BBDB5" opacity="0.8"/>
+            <path d="M7 6V5C7 3.9 7.9 3 9 3H11C12.1 3 13 3.9 13 5V6" stroke="#148F89" stroke-width="1.5" fill="none"/>
+            <circle cx="10" cy="11" r="1.5" fill="white"/>
+          </svg>
+        </div>
+        <p class="pillar-name">플랫폼 인기 상품</p>
+        <p class="pillar-desc">쿠팡·네이버쇼핑·마켓컬리 실시간 베스트 상품 큐레이션</p>
+        <p class="pillar-ex">예) "마켓컬리 이번 주 1위"<br>"쿠팡 로켓배송 식품 랭킹"</p>
+      </div>
+      <div class="pillar">
+        <div class="pillar-icon" style="background:#EAF9A0;">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M4 16V7L10 4L16 7V16" stroke="#4A7000" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+            <rect x="8" y="11" width="4" height="5" rx="1" fill="#4A7000" opacity="0.7"/>
+            <path d="M7 9H13" stroke="#4A7000" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <p class="pillar-name">연계 레시피</p>
+        <p class="pillar-desc">추천 상품을 활용한 실용적인 집밥 레시피 제공</p>
+        <p class="pillar-ex">예) "마켓컬리 밀키트로 만드는 2인분"<br>"쿠팡 소스 활용 10분 요리"</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="dv">
+
+  <div class="sec">
+    <p class="lbl">연결 플랫폼</p>
+    <div class="platform-row">
+      <span class="plat" style="background:#FFF0F0;color:var(--cp);">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect width="14" height="14" rx="3" fill="#E4393C"/><path d="M3 4H11M3 7H8.5M3 10H6.5" stroke="white" stroke-width="1.3" stroke-linecap="round"/></svg>
+        쿠팡
+      </span>
+      <span class="plat" style="background:#E8FFF2;color:#007B39;">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect width="14" height="14" rx="3" fill="#03C75A"/><path d="M4 7C4 5.3 5.3 4 7 4C8.7 4 10 5.3 10 7C10 8.7 8.7 10 7 10C5.3 10 4 8.7 4 7Z" fill="white"/></svg>
+        네이버쇼핑
+      </span>
+      <span class="plat" style="background:#F5F0FF;color:var(--mk);">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect width="14" height="14" rx="3" fill="#5C2D91"/><path d="M4.5 10V5L7 7.5L9.5 5V10" stroke="white" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        마켓컬리
+      </span>
+      <span class="plat" style="background:var(--ap-light);color:var(--ap-gm);border:.5px solid var(--ap-bubble);">+ SSG · 오아시스 등</span>
+    </div>
+  </div>
+
+  <hr class="dv">
+
+  <div class="sec">
+    <p class="lbl">콘텐츠 플로우</p>
+    <div class="flow">
+      <div class="flow-step">
+        <p class="flow-num">STEP 1</p>
+        <p class="flow-title">트렌드 감지</p>
+        <p class="flow-desc">플랫폼 랭킹·SNS 버즈·검색량으로 인기 상품 포착</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <p class="flow-num">STEP 2</p>
+        <p class="flow-title">상품 큐레이션</p>
+        <p class="flow-desc">쿠팡·마켓컬리 등 최저가·품질 비교 후 추천 링크 제공</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <p class="flow-num">STEP 3</p>
+        <p class="flow-title">레시피 연결</p>
+        <p class="flow-desc">해당 상품으로 만들 수 있는 간단 레시피 함께 제공</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="background:var(--ap-deep);">
+        <p class="flow-num" style="color:var(--ap-fizz);">결과</p>
+        <p class="flow-title" style="color:white;">구독자 구매 + 요리</p>
+        <p class="flow-desc" style="color:rgba(255,255,255,.5);">상품 리뷰 + 레시피 피드백으로 콘텐츠 순환</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="dv">
+
+  <div class="sec">
+    <p class="lbl">최종 카테고리 구조</p>
+    <div class="cat-grid">
+      <div class="cat-row">
+        <div class="cat-left"><div class="cat-dot" style="background:var(--ap-green);"></div><span class="cat-n">트렌드 리포트</span></div>
+        <span class="cat-c">트렌드 분석</span>
+      </div>
+      <div class="cat-row">
+        <div class="cat-left"><div class="cat-dot" style="background:var(--cp);"></div><span class="cat-n">쿠팡 인기 상품</span></div>
+        <span class="cat-c">상품 큐레이션</span>
+      </div>
+      <div class="cat-row">
+        <div class="cat-left"><div class="cat-dot" style="background:#03C75A;"></div><span class="cat-n">네이버쇼핑 추천</span></div>
+        <span class="cat-c">상품 큐레이션</span>
+      </div>
+      <div class="cat-row">
+        <div class="cat-left"><div class="cat-dot" style="background:var(--mk);"></div><span class="cat-n">마켓컬리 픽</span></div>
+        <span class="cat-c">상품 큐레이션</span>
+      </div>
+      <div class="cat-row">
+        <div class="cat-left"><div class="cat-dot" style="background:var(--ap-aqua);"></div><span class="cat-n">집밥 레시피</span></div>
+        <span class="cat-c">레시피</span>
+      </div>
+      <div class="cat-row">
+        <div class="cat-left"><div class="cat-dot" style="background:#B8E63C;"></div><span class="cat-n">상품 리뷰</span></div>
+        <span class="cat-c">후기</span>
+      </div>
+    </div>
+  </div>
+
+</div>

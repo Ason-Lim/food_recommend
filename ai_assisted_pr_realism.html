@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f8f9fc;color:#1a1a2e;font-size:13px;padding:20px;}
+h2.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);}
+
+.title{font-size:16px;font-weight:700;margin-bottom:3px;}
+.sub{font-size:12px;color:#778;margin-bottom:18px;}
+
+/* Score comparison */
+.score-compare{display:grid;grid-template-columns:1fr 60px 1fr;gap:0;margin-bottom:20px;align-items:center;}
+.score-box{background:white;border-radius:12px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.07);text-align:center;}
+.score-num{font-size:40px;font-weight:800;line-height:1;}
+.score-lbl{font-size:11px;color:#889;margin-top:6px;}
+.score-context{font-size:10px;margin-top:4px;font-weight:600;}
+.arrow-mid{font-size:24px;text-align:center;color:#aab;}
+
+/* Timeline */
+.timeline{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.tl-row{background:white;border-radius:10px;padding:12px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:grid;grid-template-columns:110px 1fr 80px 80px;gap:10px;align-items:center;}
+.tl-pr{font-size:12px;font-weight:700;color:#334;}
+.tl-desc{font-size:11px;color:#556;}
+.tl-solo{font-size:11px;text-align:center;padding:3px 0;border-radius:6px;}
+.tl-ai{font-size:11px;text-align:center;padding:3px 0;border-radius:6px;font-weight:700;}
+.col-head{font-size:10px;font-weight:700;color:#778;text-align:center;}
+
+/* What AI helps / not */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+.col-card{background:white;border-radius:10px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+.col-title{font-size:12px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.col-item{display:flex;align-items:flex-start;gap:7px;padding:5px 0;border-bottom:1px solid #f5f5f5;font-size:11px;line-height:1.5;color:#445;}
+.col-item:last-child{border:none;}
+.dot-g{width:7px;height:7px;border-radius:50%;background:#2e7d32;flex-shrink:0;margin-top:4px;}
+.dot-r{width:7px;height:7px;border-radius:50%;background:#e65100;flex-shrink:0;margin-top:4px;}
+
+/* Verdict */
+.verdict{background:#1a1a2e;color:white;border-radius:12px;padding:16px 20px;}
+.verdict-title{font-size:14px;font-weight:700;margin-bottom:8px;}
+.verdict-body{font-size:12px;line-height:1.9;color:#ccd;}
+.v-highlight{color:#4cdf90;font-weight:700;}
+.v-warn{color:#ffcc80;font-weight:700;}
+</style>
+</head>
+<body>
+<h2 class="sr-only">AI 협업 시 PR 실행 계획 현실성 재평가</h2>
+<div class="title">AI 협업 시 PR 실행 계획 현실성 재평가</div>
+<div class="sub">혼자 작업 vs Claude와 함께 작업 비교</div>
+
+<!-- Score comparison -->
+<div class="score-compare">
+  <div class="score-box">
+    <div class="score-num" style="color:#e65100">5</div>
+    <div style="font-size:13px;font-weight:700;margin-top:6px;">/ 10</div>
+    <div class="score-lbl">솔로 작업</div>
+    <div class="score-context" style="color:#e65100">PR-01~13: 약 4~6개월</div>
+  </div>
+  <div class="arrow-mid">→</div>
+  <div class="score-box" style="border:2px solid #2e7d32;">
+    <div class="score-num" style="color:#2e7d32">8</div>
+    <div style="font-size:13px;font-weight:700;margin-top:6px;">/ 10</div>
+    <div class="score-lbl">AI 협업</div>
+    <div class="score-context" style="color:#2e7d32">PR-01~13: 약 4~8주</div>
+  </div>
+</div>
+
+<!-- Timeline comparison -->
+<div style="font-size:13px;font-weight:700;color:#334;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #e8edff;">PR별 예상 소요 시간 비교</div>
+<div class="timeline">
+  <div class="tl-row" style="background:#f5f7fc;">
+    <span class="tl-pr" style="color:#778;">PR 묶음</span>
+    <span class="tl-desc" style="color:#778;font-weight:600;">내용</span>
+    <span class="col-head">솔로</span>
+    <span class="col-head">AI 협업</span>
+  </div>
+  <div class="tl-row">
+    <span class="tl-pr">PR-01~02</span>
+    <span class="tl-desc">스캐폴딩 + Config (pydantic+YAML, pyproject.toml)</span>
+    <span class="tl-solo" style="background:#fff3e0;color:#e65100;">1~2주</span>
+    <span class="tl-ai" style="background:#e8f5e9;color:#2e7d32;">1~2일</span>
+  </div>
+  <div class="tl-row">
+    <span class="tl-pr">PR-03~05</span>
+    <span class="tl-desc">Naver + Google collector, CLI, 로깅</span>
+    <span class="tl-solo" style="background:#fff3e0;color:#e65100;">2~3주</span>
+    <span class="tl-ai" style="background:#e8f5e9;color:#2e7d32;">3~5일</span>
+  </div>
+  <div class="tl-row">
+    <span class="tl-pr">PR-06~08</span>
+    <span class="tl-desc">Storage helpers, Cleaner, Integrator (velocity+cat_cnt)</span>
+    <span class="tl-solo" style="background:#fff3e0;color:#e65100;">2~3주</span>
+    <span class="tl-ai" style="background:#e8f5e9;color:#2e7d32;">3~5일</span>
+  </div>
+  <div class="tl-row">
+    <span class="tl-pr">PR-09~11</span>
+    <span class="tl-desc">Orchestration, Scheduling, Dashboard 리프레시</span>
+    <span class="tl-solo" style="background:#fff3e0;color:#e65100;">3~4주</span>
+    <span class="tl-ai" style="background:#e8f5e9;color:#2e7d32;">1~2주</span>
+  </div>
+  <div class="tl-row">
+    <span class="tl-pr">PR-12~13</span>
+    <span class="tl-desc">Slack 알림, 단위 테스트, CI</span>
+    <span class="tl-solo" style="background:#fff3e0;color:#e65100;">2~3주</span>
+    <span class="tl-ai" style="background:#e8f5e9;color:#2e7d32;">3~5일</span>
+  </div>
+  <div class="tl-row" style="border:1px dashed #e65100;">
+    <span class="tl-pr" style="color:#e65100;">Learning Layer</span>
+    <span class="tl-desc" style="color:#e65100;">recommender, taxonomy, recipe_linker, nutrition...</span>
+    <span class="tl-solo" style="background:#ffebee;color:#c62828;">4~6주</span>
+    <span class="tl-ai" style="background:#fff3e0;color:#e65100;">여전히 보류 권장</span>
+  </div>
+</div>
+
+<!-- What AI helps / not -->
+<div class="two-col">
+  <div class="col-card">
+    <div class="col-title" style="color:#2e7d32;">🚀 AI가 크게 단축해주는 것</div>
+    <div class="col-item"><div class="dot-g"></div><span><b>반복 패턴 코드</b> — Collector ABC 구현, Parquet read/write util, pydantic 모델 자동 생성</span></div>
+    <div class="col-item"><div class="dot-g"></div><span><b>테스트 코드</b> — cleaners, integrator 단위 테스트를 코드와 동시에 작성</span></div>
+    <div class="col-item"><div class="dot-g"></div><span><b>SQL 작성</b> — DuckDB velocity 계산 쿼리, category_count 집계 등</span></div>
+    <div class="col-item"><div class="dot-g"></div><span><b>config YAML 초안</b> — 22개 카테고리, noise 키워드 목록 정리</span></div>
+    <div class="col-item"><div class="dot-g"></div><span><b>문서화</b> — docstring, README, migration guide 초안</span></div>
+    <div class="col-item"><div class="dot-g"></div><span><b>디버깅</b> — 에러 메시지 분석, edge case 찾기</span></div>
+  </div>
+  <div class="col-card">
+    <div class="col-title" style="color:#e65100;">⚠️ AI도 해결 못 하는 것</div>
+    <div class="col-item"><div class="dot-r"></div><span><b>Google rate limiting</b> — 실제 수집 실행 중 막히는 문제. 코드가 아닌 운영 이슈.</span></div>
+    <div class="col-item"><div class="dot-r"></div><span><b>Naver endpoint 변경</b> — 갑자기 API 구조가 바뀌면 재역엔지니어링 필요. 실시간 대응.</span></div>
+    <div class="col-item"><div class="dot-r"></div><span><b>Coupang Akamai 우회</b> — 코드 문제가 아니라 봇 감지 대응. 시행착오 필요.</span></div>
+    <div class="col-item"><div class="dot-r"></div><span><b>Learning Layer의 데이터 부재</b> — 코드를 빨리 써도 훈련 데이터가 없으면 추천 품질이 낮음.</span></div>
+    <div class="col-item"><div class="dot-r"></div><span><b>canonical 테이블 시딩</b> — 한국어 식품 도메인 지식은 사람이 검토해야 함.</span></div>
+  </div>
+</div>
+
+<!-- Verdict -->
+<div class="verdict">
+  <div class="verdict-title">결론</div>
+  <div class="verdict-body">
+    <span class="v-highlight">PR-01~13 (코어 파이프라인)은 AI와 함께하면 4~8주 안에 현실적으로 완성 가능합니다.</span><br>
+    코드 작성 속도가 5~10배 빨라지므로, 솔로 기준 "5/10"이었던 현실성이 <span class="v-highlight">"8/10"</span>으로 올라갑니다.<br><br>
+    단, <span class="v-warn">Learning Layer는 속도가 아니라 데이터 부재가 문제</span>이므로 AI가 함께해도 지금 만들 이유가 없습니다.<br>
+    그리고 Google/Naver/Coupang 수집의 운영 이슈는 실제 실행하면서 맞닥뜨려야 해결됩니다 — 이건 코드 이전의 문제입니다.
+  </div>
+</div>
+
+</body>
+</html>

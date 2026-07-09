@@ -1,0 +1,83 @@
+#!/bin/bash
+# BrandConnect 링크 생성기 - 앱 실행 진입점
+# 이 파일은 desktop_app/BrandConnectLinkGenerator.app/Contents/MacOS/run 에 위치합니다.
+
+set -e
+
+# .../Contents/MacOS/run -> 세 단계 위로 올라가면 desktop_app 폴더
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
+LOG_FILE="$DIR/last_run.log"
+
+{
+  echo "=== $(date) 앱 실행 시작 ==="
+  echo "desktop_app 경로: $DIR"
+
+  # macOS에서 앱을 더블클릭으로 실행하면 터미널과 PATH가 달라서,
+  # Apple 기본 제공 python3(Command Line Tools, 구버전)가 먼저 잡히는 경우가 있습니다.
+  # 그래서 1) 이미 playwright가 설치된 python3을 최우선으로 찾고,
+  #        2) 없으면 Homebrew/python.org 경로를 Apple 기본 python3보다 우선합니다.
+  CANDIDATES="/usr/local/bin/python3 /opt/homebrew/bin/python3 python3 /usr/bin/python3"
+
+  PYTHON=""
+  for candidate in $CANDIDATES; do
+    if command -v "$candidate" >/dev/null 2>&1; then
+      if "$candidate" -c "import playwright" >/dev/null 2>&1; then
+        PYTHON="$candidate"
+        echo "playwright가 이미 설치된 python3 발견: $candidate"
+        break
+      fi
+    fi
+  done
+
+  if [ -z "$PYTHON" ]; then
+    for candidate in $CANDIDATES; do
+      if command -v "$candidate" >/dev/null 2>&1; then
+        case "$("$candidate" -c 'import sys; print(sys.executable)')" in
+          */CommandLineTools/*) continue ;;  # Apple 기본 python3는 마지막 순위로
+        esac
+        PYTHON="$candidate"
+        break
+      fi
+    done
+  fi
+
+  if [ -z "$PYTHON" ]; then
+    for candidate in $CANDIDATES; do
+      if command -v "$candidate" >/dev/null 2>&1; then
+        PYTHON="$candidate"
+        break
+      fi
+    done
+  fi
+
+  if [ -z "$PYTHON" ]; then
+    osascript -e 'display dialog "python3를 찾을 수 없습니다. https://www.python.org 에서 설치 후 다시 실행해주세요." buttons {"확인"} with icon stop'
+    exit 1
+  fi
+
+  echo "사용할 python3: $PYTHON ($($PYTHON --version 2>&1))"
+
+  if ! "$PYTHON" -c "import tkinter" >/dev/null 2>&1; then
+    osascript -e 'display dialog "이 파이썬에는 tkinter가 없습니다.\n터미널에서 아래 명령을 실행한 뒤 다시 열어주세요:\n\nbrew install python-tk" buttons {"확인"} with icon stop'
+    exit 1
+  fi
+
+  echo "필요한 패키지 설치 확인 중 (playwright, python-dotenv, requests)..."
+  if ! "$PYTHON" -m pip install -q --break-system-packages playwright python-dotenv requests 2>>"$LOG_FILE"; then
+    "$PYTHON" -m pip install -q playwright python-dotenv requests 2>>"$LOG_FILE" || true
+  fi
+
+  MARKER="$DIR/.chromium_installed"
+  if [ ! -f "$MARKER" ]; then
+    echo "Playwright용 Chromium 최초 설치 중 (몇 분 걸릴 수 있어요)..."
+    if "$PYTHON" -m playwright install chromium >>"$LOG_FILE" 2>&1; then
+      touch "$MARKER"
+    else
+      osascript -e 'display dialog "Chromium 설치에 실패했습니다. 터미널에서 다음을 직접 실행해보세요:\n\npython3 -m playwright install chromium" buttons {"확인"} with icon caution'
+    fi
+  fi
+
+  echo "GUI 앱 실행..."
+  exec "$PYTHON" "$DIR/gui_app.py"
+
+} >> "$LOG_FILE" 2>&1

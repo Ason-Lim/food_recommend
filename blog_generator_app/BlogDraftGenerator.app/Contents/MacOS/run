@@ -1,0 +1,71 @@
+#!/bin/bash
+# 애플소다 블로그 생성기 - 앱 실행 진입점
+# 이 파일은 blog_generator_app/BlogDraftGenerator.app/Contents/MacOS/run 에 위치합니다.
+
+set -e
+
+# .../Contents/MacOS/run -> 세 단계 위로 올라가면 blog_generator_app 폴더
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
+LOG_FILE="$DIR/last_run.log"
+
+{
+  echo "=== $(date) 앱 실행 시작 ==="
+  echo "blog_generator_app 경로: $DIR"
+
+  # Homebrew/python.org 경로를 Apple 기본 python3보다 우선 (자동화 감지 버그 방지와 무관하게
+  # 링크 생성기 앱과 동일한 이유: 더블클릭 실행 시 PATH가 터미널과 다름)
+  CANDIDATES="/usr/local/bin/python3 /opt/homebrew/bin/python3 python3 /usr/bin/python3"
+
+  PYTHON=""
+  for candidate in $CANDIDATES; do
+    if command -v "$candidate" >/dev/null 2>&1; then
+      if "$candidate" -c "import anthropic" >/dev/null 2>&1; then
+        PYTHON="$candidate"
+        echo "anthropic 패키지가 이미 설치된 python3 발견: $candidate"
+        break
+      fi
+    fi
+  done
+
+  if [ -z "$PYTHON" ]; then
+    for candidate in $CANDIDATES; do
+      if command -v "$candidate" >/dev/null 2>&1; then
+        case "$("$candidate" -c 'import sys; print(sys.executable)')" in
+          */CommandLineTools/*) continue ;;
+        esac
+        PYTHON="$candidate"
+        break
+      fi
+    done
+  fi
+
+  if [ -z "$PYTHON" ]; then
+    for candidate in $CANDIDATES; do
+      if command -v "$candidate" >/dev/null 2>&1; then
+        PYTHON="$candidate"
+        break
+      fi
+    done
+  fi
+
+  if [ -z "$PYTHON" ]; then
+    osascript -e 'display dialog "python3를 찾을 수 없습니다. https://www.python.org 에서 설치 후 다시 실행해주세요." buttons {"확인"} with icon stop'
+    exit 1
+  fi
+
+  echo "사용할 python3: $PYTHON ($($PYTHON --version 2>&1))"
+
+  if ! "$PYTHON" -c "import tkinter" >/dev/null 2>&1; then
+    osascript -e 'display dialog "이 파이썬에는 tkinter가 없습니다.\n터미널에서 brew install python-tk 실행 후 다시 열어주세요." buttons {"확인"} with icon stop'
+    exit 1
+  fi
+
+  echo "필요한 패키지 설치 확인 중 (anthropic, python-dotenv)..."
+  if ! "$PYTHON" -m pip install -q --break-system-packages anthropic python-dotenv 2>>"$LOG_FILE"; then
+    "$PYTHON" -m pip install -q anthropic python-dotenv 2>>"$LOG_FILE" || true
+  fi
+
+  echo "GUI 앱 실행..."
+  exec "$PYTHON" "$DIR/blog_gui_app.py"
+
+} >> "$LOG_FILE" 2>&1

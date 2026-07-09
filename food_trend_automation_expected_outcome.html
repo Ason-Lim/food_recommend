@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, 'Apple SD Gothic Neo', Arial, sans-serif; background: transparent; color: #1a1a1a; font-size: 13px; }
+
+  .root { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+
+  /* ── HEADER ── */
+  .page-title { font-size: 15px; font-weight: 700; color: #1B5E20; border-bottom: 2px solid #4CAF50; padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+  .badge { background: #E8F5E9; color: #2E7D32; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
+
+  /* ── SECTION LABEL ── */
+  .section-label { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #888; margin-bottom: 4px; }
+
+  /* ── PIPELINE ROW ── */
+  .pipeline { display: flex; align-items: center; gap: 0; background: #f7f7f7; border-radius: 10px; padding: 10px 12px; overflow-x: auto; }
+  .pipe-box { display: flex; flex-direction: column; align-items: center; min-width: 90px; }
+  .pipe-icon { font-size: 18px; margin-bottom: 2px; }
+  .pipe-name { font-size: 11px; font-weight: 700; text-align: center; line-height: 1.2; }
+  .pipe-sub { font-size: 10px; color: #888; text-align: center; margin-top: 1px; line-height: 1.2; }
+  .pipe-arrow { color: #bbb; font-size: 18px; margin: 0 4px; flex-shrink: 0; }
+
+  /* ── STATUS COLORS ── */
+  .done   { background: #E8F5E9; border: 1.5px solid #81C784; border-radius: 8px; padding: 6px 8px; }
+  .inprog { background: #FFF9C4; border: 1.5px solid #F9A825; border-radius: 8px; padding: 6px 8px; }
+  .plan   { background: #F3F4F6; border: 1.5px dashed #BDBDBD; border-radius: 8px; padding: 6px 8px; }
+
+  /* ── GRID ── */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+  /* ── CARD ── */
+  .card { border-radius: 10px; padding: 10px 12px; }
+  .card-title { font-size: 12px; font-weight: 700; margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
+  .card-body  { font-size: 11px; color: #444; line-height: 1.55; }
+  .card-body li { margin-left: 12px; }
+
+  .c-green  { background: #E8F5E9; border: 1.5px solid #A5D6A7; }
+  .c-blue   { background: #E3F2FD; border: 1.5px solid #90CAF9; }
+  .c-orange { background: #FFF3E0; border: 1.5px solid #FFCC80; }
+  .c-purple { background: #EDE7F6; border: 1.5px solid #CE93D8; }
+  .c-red    { background: #FFEBEE; border: 1.5px solid #EF9A9A; }
+  .c-teal   { background: #E0F2F1; border: 1.5px solid #80CBC4; }
+
+  /* ── PR TIMELINE ── */
+  .timeline { display: flex; flex-direction: column; gap: 6px; }
+  .phase { border-radius: 8px; overflow: hidden; }
+  .phase-hdr { font-size: 11px; font-weight: 700; padding: 5px 10px; display: flex; justify-content: space-between; align-items: center; }
+  .phase-body { display: flex; flex-wrap: wrap; gap: 4px; padding: 6px 10px; }
+  .pr-chip { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 12px; white-space: nowrap; }
+
+  .ph0 .phase-hdr { background: #4CAF50; color: #fff; }
+  .ph0 .phase-body { background: #F1F8E9; }
+  .ph0 .pr-chip   { background: #C8E6C9; color: #1B5E20; }
+
+  .ph1 .phase-hdr { background: #1976D2; color: #fff; }
+  .ph1 .phase-body { background: #E3F2FD; }
+  .ph1 .pr-chip   { background: #BBDEFB; color: #0D47A1; }
+
+  .ph2 .phase-hdr { background: #F57C00; color: #fff; }
+  .ph2 .phase-body { background: #FFF3E0; }
+  .ph2 .pr-chip   { background: #FFE0B2; color: #BF360C; }
+
+  .ph3 .phase-hdr { background: #7B1FA2; color: #fff; }
+  .ph3 .phase-body { background: #EDE7F6; }
+  .ph3 .pr-chip   { background: #E1BEE7; color: #4A148C; }
+
+  .ph4 .phase-hdr { background: #455A64; color: #fff; }
+  .ph4 .phase-body { background: #ECEFF1; }
+  .ph4 .pr-chip   { background: #CFD8DC; color: #263238; }
+
+  /* ── DATA LAYER ── */
+  .data-row { display: flex; gap: 8px; align-items: stretch; }
+  .layer-box { flex: 1; border-radius: 8px; padding: 8px 10px; }
+  .layer-title { font-size: 11px; font-weight: 700; margin-bottom: 4px; }
+  .schema-row { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 3px; }
+  .tag { font-size: 10px; padding: 1px 6px; border-radius: 8px; background: rgba(0,0,0,.07); color: #333; }
+  .tag.new { background: #FFF9C4; color: #E65100; font-weight: 700; }
+
+  /* ── DASHBOARD PREVIEW ── */
+  .dash-preview { background: #263238; border-radius: 10px; padding: 10px; }
+  .dash-topbar { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+  .dash-tab { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 12px; cursor: pointer; transition: all .15s; }
+  .dash-tab.active { background: #4CAF50; color: #fff; }
+  .dash-tab.inactive { background: rgba(255,255,255,.12); color: rgba(255,255,255,.7); }
+  .dash-tab:hover { opacity: .8; }
+  .dash-content { background: rgba(255,255,255,.06); border-radius: 8px; padding: 10px; color: rgba(255,255,255,.9); min-height: 80px; }
+  .kpi-row { display: flex; gap: 8px; margin-bottom: 8px; }
+  .kpi { flex: 1; background: rgba(255,255,255,.1); border-radius: 6px; padding: 6px 8px; text-align: center; }
+  .kpi-val { font-size: 16px; font-weight: 700; color: #fff; }
+  .kpi-lbl { font-size: 9px; color: rgba(255,255,255,.6); margin-top: 1px; }
+  .kpi-delta { font-size: 10px; color: #69F0AE; }
+  .bar-row { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+  .bar-label { font-size: 10px; color: rgba(255,255,255,.8); width: 110px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bar-track { flex: 1; background: rgba(255,255,255,.1); border-radius: 3px; height: 12px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; display: flex; align-items: center; padding-left: 4px; }
+  .bar-val { font-size: 9px; color: #fff; }
+  .naver-dot { width: 6px; height: 6px; border-radius: 50%; background: #69F0AE; flex-shrink: 0; }
+
+  .legend { display: flex; gap: 10px; margin-top: 6px; }
+  .legend-item { display: flex; align-items: center; gap: 4px; font-size: 10px; color: rgba(255,255,255,.6); }
+  .dot-g { width: 8px; height: 8px; border-radius: 50%; background: #69F0AE; }
+  .dot-b { width: 8px; height: 8px; border-radius: 50%; background: #64B5F6; }
+
+  /* ── TECH STACK ── */
+  .tech-row { display: flex; flex-wrap: wrap; gap: 5px; }
+  .tech-chip { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 12px; }
+
+  /* ── STATUS LEGEND ── */
+  .status-legend { display: flex; gap: 10px; }
+  .sl-item { display: flex; align-items: center; gap: 4px; font-size: 10px; color: #666; }
+  .sl-dot { width: 10px; height: 10px; border-radius: 3px; }
+
+  .divider { border: none; border-top: 1px solid #eee; }
+
+  /* tab switch */
+  .view-content { display: none; }
+  .view-content.active { display: block; }
+</style>
+</head>
+<body>
+<div class="root">
+
+  <!-- HEADER -->
+  <div class="page-title">
+    🍏 food-trend-automation — 예상 최종 결과물
+    <div style="display:flex;gap:6px;">
+      <span class="badge">15 PRs</span>
+      <span class="badge">5 Phases</span>
+    </div>
+  </div>
+
+  <!-- STATUS LEGEND -->
+  <div class="status-legend">
+    <div class="sl-item"><div class="sl-dot" style="background:#A5D6A7;border:1.5px solid #81C784;"></div> 완료/기존</div>
+    <div class="sl-item"><div class="sl-dot" style="background:#FFF9C4;border:1.5px solid #F9A825;"></div> 진행 예정 (핵심)</div>
+    <div class="sl-item"><div class="sl-dot" style="background:#F3F4F6;border:1px dashed #BDBDBD;"></div> 추후 확장</div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- PIPELINE -->
+  <div>
+    <div class="section-label">데이터 파이프라인</div>
+    <div class="pipeline">
+      <div class="pipe-box done">
+        <div class="pipe-icon">📡</div>
+        <div class="pipe-name">Collectors</div>
+        <div class="pipe-sub">Naver · Google<br>Coupang (신규)</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-box done">
+        <div class="pipe-icon">🗄️</div>
+        <div class="pipe-name">Raw Layer</div>
+        <div class="pipe-sub">Parquet (불변)<br>날짜 파티션</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-box inprog">
+        <div class="pipe-icon">⚙️</div>
+        <div class="pipe-name">Processors</div>
+        <div class="pipe-sub">cleaner · integrator<br>velocity · category_count</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-box inprog">
+        <div class="pipe-icon">💾</div>
+        <div class="pipe-name">Curated Layer</div>
+        <div class="pipe-sub">DuckDB 기본<br>+ Parquet</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-box inprog">
+        <div class="pipe-icon">📊</div>
+        <div class="pipe-name">Outputs</div>
+        <div class="pipe-sub">Dashboard<br>Reports · Alerts</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-box plan">
+        <div class="pipe-icon">🤖</div>
+        <div class="pipe-name">Recommendations</div>
+        <div class="pipe-sub">추천 · 레시피<br>영양정보</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 데이터 소스 & 저장 -->
+  <div class="grid2">
+    <div>
+      <div class="section-label">수집 소스 (3개 플랫폼)</div>
+      <div style="display:flex;flex-direction:column;gap:5px;">
+        <div class="card c-green">
+          <div class="card-title">🟢 네이버 Shopping Insight</div>
+          <div class="card-body">식품 top ~500 키워드 · 일별 순위<br>cid: 50000006 (식품 전체)<br>수집: 매일 06:00</div>
+        </div>
+        <div class="card c-blue">
+          <div class="card-title">🔵 Google Trends</div>
+          <div class="card-body">22개 카테고리 · rising / top 쿼리<br>value 0~200+ · 7일 윈도우<br>수집: 매일 08:00</div>
+        </div>
+        <div class="card c-orange" style="border-style:dashed;">
+          <div class="card-title">🟡 쿠팡 <span style="font-size:10px;font-weight:400;color:#888">(Phase 2)</span></div>
+          <div class="card-body">신선식품·건강식품 베스트셀러<br>categoryId 기반 순위 수집<br>Akamai 대응 필수</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">Curated 데이터 테이블</div>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <div class="layer-box" style="background:#E8F5E9;border:1.5px solid #A5D6A7;">
+          <div class="layer-title">📋 daily_naver_ranks.parquet</div>
+          <div class="schema-row"><span class="tag">date</span><span class="tag">rank</span><span class="tag">keyword</span><span class="tag">ingested_at</span></div>
+        </div>
+        <div class="layer-box" style="background:#E3F2FD;border:1.5px solid #90CAF9;">
+          <div class="layer-title">📈 google_related_queries.parquet</div>
+          <div class="schema-row"><span class="tag">query</span><span class="tag">value</span><span class="tag">source_kw</span><span class="tag">trend_type</span><span class="tag">category_name</span></div>
+        </div>
+        <div class="layer-box" style="background:#FFF3E0;border:1.5px solid #FFCC80;">
+          <div class="layer-title">🔗 integrated_daily_signals.parquet</div>
+          <div class="schema-row"><span class="tag">query</span><span class="tag">value</span><span class="tag">is_naver</span><span class="tag">naver_rank</span><span class="tag new">velocity_score</span><span class="tag new">category_count</span></div>
+        </div>
+        <div class="layer-box" style="background:#EDE7F6;border:1.5px dashed #CE93D8;">
+          <div class="layer-title">👤 user_interactions.parquet <span style="font-size:10px;color:#888">(Phase 3)</span></div>
+          <div class="schema-row"><span class="tag">session_id</span><span class="tag">interaction_type</span><span class="tag">query</span><span class="tag">context</span></div>
+        </div>
+        <div class="layer-box" style="background:#ECEFF1;border:1.5px dashed #B0BEC5;">
+          <div class="layer-title">📝 run_history.parquet</div>
+          <div class="schema-row"><span class="tag">run_id</span><span class="tag">naver_status</span><span class="tag">google_rows</span><span class="tag new">error_type</span><span class="tag new">is_backfill</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- DASHBOARD PREVIEW -->
+  <div>
+    <div class="section-label">대시보드 미리보기 (Streamlit · 6개 뷰)</div>
+    <div class="dash-preview">
+      <div class="dash-topbar" id="tabs">
+        <div class="dash-tab active" onclick="switchTab(0)">🏠 Daily Overview</div>
+        <div class="dash-tab inactive" onclick="switchTab(1)">📈 Google Rising</div>
+        <div class="dash-tab inactive" onclick="switchTab(2)">📊 Naver Rankings</div>
+        <div class="dash-tab inactive" onclick="switchTab(3)">🔗 Integrated</div>
+        <div class="dash-tab inactive" onclick="switchTab(4)">🔍 Deep Dive</div>
+        <div class="dash-tab inactive" onclick="switchTab(5)">📥 Reports</div>
+      </div>
+
+      <!-- View 0: Overview -->
+      <div class="dash-content view-content active" id="view0">
+        <div class="kpi-row">
+          <div class="kpi"><div class="kpi-val">87</div><div class="kpi-lbl">통합 신호</div><div class="kpi-delta">+12 ↑</div></div>
+          <div class="kpi"><div class="kpi-val">34</div><div class="kpi-lbl">네이버 매칭</div><div class="kpi-delta">39% ✅</div></div>
+          <div class="kpi"><div class="kpi-val">112</div><div class="kpi-lbl">평균 급상승값</div><div class="kpi-delta"></div></div>
+          <div class="kpi"><div class="kpi-val">영양제</div><div class="kpi-lbl">Top 카테고리</div><div class="kpi-delta"></div></div>
+        </div>
+        <div class="bar-row"><div class="naver-dot"></div><div class="bar-label">당뇨 영양제</div><div class="bar-track"><div class="bar-fill" style="width:100%;background:#69F0AE;"><span class="bar-val">140</span></div></div></div>
+        <div class="bar-row"><div class="naver-dot"></div><div class="bar-label">눈 건강 영양제</div><div class="bar-track"><div class="bar-fill" style="width:93%;background:#69F0AE;"><span class="bar-val">130</span></div></div></div>
+        <div class="bar-row"><div class="naver-dot" style="background:#64B5F6;"></div><div class="bar-label">마그네슘 효능</div><div class="bar-track"><div class="bar-fill" style="width:64%;background:#64B5F6;"><span class="bar-val">90</span></div></div></div>
+        <div class="bar-row"><div class="naver-dot"></div><div class="bar-label">콜라겐 영양제</div><div class="bar-track"><div class="bar-fill" style="width:50%;background:#69F0AE;"><span class="bar-val">70</span></div></div></div>
+        <div class="legend"><div class="legend-item"><div class="dot-g"></div>네이버 매칭 (상업 신호)</div><div class="legend-item"><div class="dot-b"></div>Google only</div></div>
+      </div>
+
+      <!-- View 1: Google Rising -->
+      <div class="dash-content view-content" id="view1">
+        <div style="color:rgba(255,255,255,.5);font-size:11px;margin-bottom:6px;">영양제 카테고리 · rising 필터 · is_naver ON</div>
+        <div class="bar-row"><div class="naver-dot"></div><div class="bar-label">당뇨 영양제 🔥</div><div class="bar-track"><div class="bar-fill" style="width:100%;background:#69F0AE;"></div></div><span style="color:#fff;font-size:10px;margin-left:4px;">140 rising</span></div>
+        <div class="bar-row"><div class="naver-dot"></div><div class="bar-label">눈 건강 영양제</div><div class="bar-track"><div class="bar-fill" style="width:93%;background:#69F0AE;"></div></div><span style="color:#fff;font-size:10px;margin-left:4px;">130 rising</span></div>
+        <div class="bar-row"><div class="naver-dot"></div><div class="bar-label">콜라겐 영양제</div><div class="bar-track"><div class="bar-fill" style="width:50%;background:#69F0AE;"></div></div><span style="color:#fff;font-size:10px;margin-left:4px;">70 rising ✅</span></div>
+        <div style="margin-top:8px;font-size:10px;color:rgba(255,255,255,.4);">✅ = 네이버 쇼핑 TOP 500 동시 등장 (상업적 관련성 높음)</div>
+      </div>
+
+      <!-- View 2: Naver -->
+      <div class="dash-content view-content" id="view2">
+        <div style="color:rgba(255,255,255,.5);font-size:11px;margin-bottom:6px;">2026-05-06 네이버 TOP 500 스냅샷</div>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:4px;">
+          <div style="background:rgba(255,255,255,.08);border-radius:5px;padding:5px 8px;font-size:11px;">🥇 <b>쌀20kg</b> <span style="color:#69F0AE;font-size:10px;">rank 1</span></div>
+          <div style="background:rgba(255,255,255,.08);border-radius:5px;padding:5px 8px;font-size:11px;">🥈 <b>닭가슴살</b> <span style="color:#69F0AE;font-size:10px;">rank 2</span></div>
+          <div style="background:rgba(255,255,255,.08);border-radius:5px;padding:5px 8px;font-size:11px;">4위 <b>어버이날선물</b> <span style="color:#FFD54F;font-size:10px;">seasonal</span></div>
+          <div style="background:rgba(255,255,255,.08);border-radius:5px;padding:5px 8px;font-size:11px;">5위 <b>오메가3</b> <span style="color:#CE93D8;font-size:10px;">Google↑</span></div>
+        </div>
+        <div style="margin-top:6px;font-size:10px;color:rgba(255,255,255,.4);">🟣 = Google rising 동시 등장 · 🟡 = 계절성 감지</div>
+      </div>
+
+      <!-- View 3: Integrated -->
+      <div class="dash-content view-content" id="view3">
+        <div style="color:rgba(255,255,255,.5);font-size:11px;margin-bottom:6px;">통합 상업 신호 · value↓ · rising 우선</div>
+        <table style="width:100%;border-collapse:collapse;font-size:10px;color:rgba(255,255,255,.85);">
+          <thead><tr style="color:rgba(255,255,255,.4);">
+            <td style="padding:2px 4px;">키워드</td><td>value🔥</td><td>source</td><td>type</td><td>네이버✅</td><td>rank</td><td>velocity</td>
+          </tr></thead>
+          <tbody>
+            <tr style="background:rgba(105,240,174,.12)"><td style="padding:3px 4px;">당뇨 영양제</td><td>140</td><td>영양제</td><td>rising</td><td>✅</td><td>-</td><td style="color:#69F0AE;">↑↑</td></tr>
+            <tr><td style="padding:3px 4px;">눈 건강 영양제</td><td>130</td><td>영양제</td><td>rising</td><td>✅</td><td>-</td><td style="color:#69F0AE;">↑</td></tr>
+            <tr style="background:rgba(105,240,174,.12)"><td style="padding:3px 4px;">콜라겐 영양제</td><td>70</td><td>영양제</td><td>rising</td><td>✅</td><td>18</td><td style="color:#FFD54F;">→</td></tr>
+            <tr><td style="padding:3px 4px;">마그네슘 효능</td><td>90</td><td>영양제</td><td>top</td><td>❌</td><td>-</td><td style="color:#64B5F6;">↑</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- View 4: Deep Dive -->
+      <div class="dash-content view-content" id="view4">
+        <div style="color:rgba(255,255,255,.5);font-size:11px;margin-bottom:5px;">키워드 트렌드 탐색 · 선택: 닭가슴살, 콜라겐 영양제</div>
+        <svg viewBox="0 0 340 70" style="width:100%;height:70px;">
+          <line x1="0" y1="60" x2="340" y2="60" stroke="rgba(255,255,255,.15)" stroke-width="1"/>
+          <!-- 닭가슴살 Google value line -->
+          <polyline points="0,45 60,42 120,30 180,35 240,28 300,32 340,25" fill="none" stroke="#69F0AE" stroke-width="2"/>
+          <!-- 콜라겐 영양제 -->
+          <polyline points="0,55 60,53 120,50 180,44 240,38 300,33 340,30" fill="none" stroke="#CE93D8" stroke-width="2"/>
+          <!-- Naver rank (inverted) -->
+          <polyline points="0,50 60,40 120,25 180,22 240,18 300,20 340,18" fill="none" stroke="#69F0AE" stroke-width="1.5" stroke-dasharray="4,3" opacity=".7"/>
+          <text x="5" y="12" fill="rgba(255,255,255,.5)" font-size="8">Google value</text>
+          <text x="5" y="22" fill="rgba(255,255,255,.35)" font-size="8">--- Naver rank (역축)</text>
+        </svg>
+        <div style="display:flex;gap:10px;margin-top:4px;">
+          <div style="font-size:10px;color:#69F0AE;">■ 닭가슴살</div>
+          <div style="font-size:10px;color:#CE93D8;">■ 콜라겐 영양제</div>
+        </div>
+      </div>
+
+      <!-- View 5: Reports -->
+      <div class="dash-content view-content" id="view5">
+        <div style="color:rgba(255,255,255,.5);font-size:11px;margin-bottom:6px;">최근 리포트 · 파이프라인 상태</div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <div style="background:rgba(255,255,255,.08);border-radius:5px;padding:5px 10px;display:flex;justify-content:space-between;align-items:center;font-size:10px;">
+            <span style="color:#fff;">2026-05-08</span>
+            <span style="color:rgba(255,255,255,.5);">11 signals · 3 is_naver</span>
+            <span style="background:#4CAF50;color:#fff;padding:1px 7px;border-radius:8px;">✓</span>
+          </div>
+          <div style="background:rgba(255,255,255,.08);border-radius:5px;padding:5px 10px;display:flex;justify-content:space-between;align-items:center;font-size:10px;">
+            <span style="color:#fff;">2026-05-07</span>
+            <span style="color:rgba(255,255,255,.5);">24 signals · 9 is_naver</span>
+            <span style="background:#4CAF50;color:#fff;padding:1px 7px;border-radius:8px;">✓</span>
+          </div>
+          <div style="background:rgba(255,255,255,.08);border-radius:5px;padding:5px 10px;display:flex;justify-content:space-between;align-items:center;font-size:10px;">
+            <span style="color:#fff;">2026-05-06</span>
+            <span style="color:rgba(255,255,255,.5);">Google rate limit</span>
+            <span style="background:#F44336;color:#fff;padding:1px 7px;border-radius:8px;">✗</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- PR TIMELINE -->
+  <div>
+    <div class="section-label">구현 로드맵 (PR 계획)</div>
+    <div class="timeline">
+      <div class="phase ph0">
+        <div class="phase-hdr">Phase 0 — 기초 <span style="font-weight:400;font-size:10px;">PR-01, 02</span></div>
+        <div class="phase-body">
+          <span class="pr-chip">PR-01 프로젝트 스캐폴딩</span>
+          <span class="pr-chip">PR-02 설정 시스템 (pydantic+YAML)</span>
+        </div>
+      </div>
+      <div class="phase ph1">
+        <div class="phase-hdr">Phase 1 — 수집기 <span style="font-weight:400;font-size:10px;">PR-03~05</span></div>
+        <div class="phase-body">
+          <span class="pr-chip">PR-03 Naver Collector</span>
+          <span class="pr-chip">PR-04 Google Collector</span>
+          <span class="pr-chip">PR-05 Base Class + CLI</span>
+        </div>
+      </div>
+      <div class="phase ph2">
+        <div class="phase-hdr">Phase 2 — 저장 & 처리 <span style="font-weight:400;font-size:10px;">PR-06~08</span></div>
+        <div class="phase-body">
+          <span class="pr-chip">PR-06 Parquet + DuckDB helpers</span>
+          <span class="pr-chip">PR-07 cleaner (noise/valuable)</span>
+          <span class="pr-chip">PR-08 integrator (velocity + category_count)</span>
+        </div>
+      </div>
+      <div class="phase ph3">
+        <div class="phase-hdr">Phase 3 — 오케스트레이션 + 대시보드 <span style="font-weight:400;font-size:10px;">PR-09~11 + UI-01~05</span></div>
+        <div class="phase-body">
+          <span class="pr-chip">PR-09 daily_runner</span>
+          <span class="pr-chip">PR-10 스케줄링</span>
+          <span class="pr-chip">PR-11 Dashboard (6 views)</span>
+          <span class="pr-chip">PR-UI-01 Overview + loaders</span>
+          <span class="pr-chip">PR-UI-02 Google/Naver 탭</span>
+          <span class="pr-chip">PR-UI-03 Integrated Explorer</span>
+          <span class="pr-chip">PR-UI-04 Deep Dive</span>
+          <span class="pr-chip">PR-UI-05 Reports + 폴리시</span>
+        </div>
+      </div>
+      <div class="phase ph4">
+        <div class="phase-hdr">Phase 4 — 강화 & 마이그레이션 <span style="font-weight:400;font-size:10px;">PR-12~15</span></div>
+        <div class="phase-body">
+          <span class="pr-chip">PR-12 구조화 로깅 + Slack</span>
+          <span class="pr-chip">PR-13 테스트 + CI</span>
+          <span class="pr-chip">PR-14 마이그레이션 가이드</span>
+          <span class="pr-chip">PR-15 확장성 증명 (신규 소스)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- TECH STACK + KEY METRICS -->
+  <div class="grid2">
+    <div>
+      <div class="section-label">기술 스택</div>
+      <div class="tech-row">
+        <span class="tech-chip" style="background:#E8F5E9;color:#1B5E20;">Python 3.11+</span>
+        <span class="tech-chip" style="background:#E3F2FD;color:#0D47A1;">pandas + pyarrow</span>
+        <span class="tech-chip" style="background:#FFF3E0;color:#E65100;">DuckDB (default)</span>
+        <span class="tech-chip" style="background:#EDE7F6;color:#4A148C;">pydantic-settings</span>
+        <span class="tech-chip" style="background:#FCE4EC;color:#880E4F;">Streamlit</span>
+        <span class="tech-chip" style="background:#E0F2F1;color:#004D40;">Plotly</span>
+        <span class="tech-chip" style="background:#F3F4F6;color:#333;">uv (패키징)</span>
+        <span class="tech-chip" style="background:#FFF9C4;color:#E65100;">structlog</span>
+        <span class="tech-chip" style="background:#F3F4F6;color:#333;">pytrends</span>
+        <span class="tech-chip" style="background:#F3F4F6;color:#333;">pytest + VCR</span>
+      </div>
+    </div>
+    <div>
+      <div class="section-label">핵심 성능 목표</div>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <div class="card" style="background:#F7F7F7;border:1px solid #eee;padding:6px 10px;">
+          <div style="display:flex;justify-content:space-between;font-size:11px;">
+            <span>대시보드 기본 뷰 로드</span><span style="font-weight:700;color:#2E7D32;">&lt; 2초</span>
+          </div>
+        </div>
+        <div class="card" style="background:#F7F7F7;border:1px solid #eee;padding:6px 10px;">
+          <div style="display:flex;justify-content:space-between;font-size:11px;">
+            <span>90일 히스토리 쿼리</span><span style="font-weight:700;color:#2E7D32;">&lt; 1초</span>
+          </div>
+        </div>
+        <div class="card" style="background:#F7F7F7;border:1px solid #eee;padding:6px 10px;">
+          <div style="display:flex;justify-content:space-between;font-size:11px;">
+            <span>3클릭으로 Deep Dive 접근</span><span style="font-weight:700;color:#2E7D32;">✅</span>
+          </div>
+        </div>
+        <div class="card" style="background:#F7F7F7;border:1px solid #eee;padding:6px 10px;">
+          <div style="display:flex;justify-content:space-between;font-size:11px;">
+            <span>수집 파이프라인 패리티</span><span style="font-weight:700;color:#2E7D32;">100%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function switchTab(idx) {
+  document.querySelectorAll('.dash-tab').forEach((t,i) => {
+    t.className = 'dash-tab ' + (i===idx ? 'active' : 'inactive');
+  });
+  document.querySelectorAll('.view-content').forEach((v,i) => {
+    v.className = 'view-content ' + (i===idx ? 'active' : '');
+  });
+}
+</script>
+</body>
+</html>

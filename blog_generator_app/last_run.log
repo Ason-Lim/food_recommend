@@ -1,0 +1,9 @@
+=== Thu Jul  9 12:29:59 KST 2026 앱 실행 시작 ===
+blog_generator_app 경로: /Users/mom/food_recommend/blog_generator_app
+사용할 python3: /usr/local/bin/python3 (Python 3.14.6)
+필요한 패키지 설치 확인 중 (anthropic, python-dotenv)...
+  WARNING: The script distro is installed in '/usr/local/bin' which is not on PATH.
+  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+  WARNING: The script httpx is installed in '/usr/local/bin' which is not on PATH.
+  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+GUI 앱 실행...

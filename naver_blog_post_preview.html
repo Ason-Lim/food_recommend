@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f0f0f0;font-size:14px;}
+
+/* Naver blog shell */
+.naver-shell{max-width:860px;margin:0 auto;background:white;}
+.naver-header{background:#03c75a;padding:10px 20px;display:flex;align-items:center;gap:10px;}
+.naver-logo{color:white;font-size:16px;font-weight:900;letter-spacing:-1px;}
+.naver-blog-title{color:white;font-size:13px;opacity:.9;margin-left:8px;border-left:1px solid rgba(255,255,255,.4);padding-left:10px;}
+.blog-meta-bar{background:#f9f9f9;border-bottom:1px solid #e8e8e8;padding:10px 30px;display:flex;align-items:center;justify-content:space-between;}
+.author-info{display:flex;align-items:center;gap:8px;}
+.author-avatar{width:32px;height:32px;border-radius:50%;background:#03c75a;display:flex;align-items:center;justify-content:center;color:white;font-size:14px;font-weight:700;}
+.author-name{font-size:13px;font-weight:600;color:#333;}
+.post-date{font-size:11px;color:#999;}
+.follow-btn{background:#03c75a;color:white;border:none;padding:5px 14px;border-radius:3px;font-size:12px;cursor:pointer;font-weight:600;}
+
+/* Post content */
+.post-body{padding:30px 40px 40px;}
+.post-title{font-size:22px;font-weight:700;color:#1a1a1a;line-height:1.4;margin-bottom:8px;}
+.post-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;}
+.post-tag{font-size:11px;color:#03c75a;background:#f0fff7;padding:3px 10px;border-radius:12px;cursor:pointer;}
+.post-tag:hover{background:#d0f5e8;}
+
+/* SEO badge */
+.seo-badge{display:inline-flex;align-items:center;gap:5px;background:#fff3cd;border:1px solid #ffe08a;border-radius:6px;padding:5px 10px;font-size:11px;color:#7a5c00;margin-bottom:18px;}
+
+/* Content sections */
+.intro{background:#f8f9fa;border-left:4px solid #03c75a;border-radius:0 8px 8px 0;padding:14px 16px;margin-bottom:24px;font-size:13px;line-height:1.8;color:#333;}
+.intro strong{color:#03c75a;}
+
+.toc{background:#f5f5f5;border-radius:8px;padding:14px 18px;margin-bottom:24px;}
+.toc-title{font-size:12px;font-weight:700;color:#555;margin-bottom:8px;}
+.toc li{font-size:12px;color:#1a6fba;padding:3px 0;cursor:pointer;}
+.toc li:hover{text-decoration:underline;}
+.toc{list-style:none;}
+
+.section{margin-bottom:28px;}
+.section-h2{font-size:18px;font-weight:700;color:#1a1a1a;padding-bottom:8px;border-bottom:2px solid #03c75a;margin-bottom:14px;display:flex;align-items:center;gap:6px;}
+.section-body{font-size:13px;line-height:1.9;color:#333;}
+.section-body p{margin-bottom:10px;}
+
+/* Table */
+.info-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px;}
+.info-table th{background:#f0fff7;color:#1a6e3f;font-weight:700;padding:8px 12px;border:1px solid #d4edda;text-align:center;}
+.info-table td{padding:8px 12px;border:1px solid #e8e8e8;text-align:center;}
+.info-table tr:hover td{background:#f8fff8;}
+.star{color:#f0a500;}
+
+/* Tip box */
+.tip-box{background:#e8f5e9;border-radius:8px;padding:12px 16px;margin:12px 0;font-size:12px;color:#2e7d32;line-height:1.7;}
+.tip-box::before{content:'✅ ';font-weight:700;}
+
+/* CTA button */
+.cta-wrap{text-align:center;margin:16px 0;}
+.cta-btn{display:inline-block;background:linear-gradient(135deg,#03c75a,#02a84a);color:white;padding:12px 28px;border-radius:6px;font-size:14px;font-weight:700;text-decoration:none;cursor:pointer;box-shadow:0 3px 8px rgba(3,199,90,.3);border:none;}
+.cta-btn:hover{background:linear-gradient(135deg,#02b050,#019040);}
+.cta-btn .arrow{margin-left:6px;}
+
+/* Product cards */
+.product-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:14px 0;}
+.p-card{border:1px solid #e8e8e8;border-radius:10px;padding:14px;position:relative;}
+.p-card:hover{border-color:#03c75a;box-shadow:0 2px 8px rgba(0,0,0,.08);}
+.p-badge{position:absolute;top:10px;right:10px;background:#ff4b4b;color:white;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:700;}
+.p-icon{font-size:28px;margin-bottom:6px;}
+.p-name{font-size:13px;font-weight:700;color:#1a1a1a;margin-bottom:4px;}
+.p-desc{font-size:11px;color:#777;line-height:1.5;margin-bottom:8px;}
+.p-point{font-size:11px;color:#03c75a;font-weight:600;}
+.p-cta{width:100%;background:#03c75a;color:white;border:none;padding:7px;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer;margin-top:8px;}
+.p-cta:hover{background:#02a84a;}
+
+/* Checklist */
+.checklist{background:#f8f9fa;border-radius:8px;padding:14px 18px;margin:12px 0;}
+.check-item{display:flex;align-items:flex-start;gap:8px;padding:4px 0;font-size:12px;color:#333;}
+.check-icon{color:#03c75a;font-weight:700;flex-shrink:0;}
+
+/* Summary table */
+.summary-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px;}
+.summary-table th{background:#1a1a1a;color:white;padding:9px 14px;text-align:left;}
+.summary-table td{padding:9px 14px;border-bottom:1px solid #f0f0f0;}
+.summary-table tr:hover td{background:#f8f9fa;}
+
+/* Outro */
+.outro{background:#f0fff7;border-radius:10px;padding:18px;text-align:center;margin:20px 0;}
+.outro p{font-size:13px;color:#333;line-height:1.8;}
+.like-section{display:flex;justify-content:center;gap:16px;margin:20px 0;padding-top:16px;border-top:1px solid #f0f0f0;}
+.like-btn{display:flex;align-items:center;gap:5px;background:#f5f5f5;border:1px solid #e0e0e0;padding:8px 20px;border-radius:20px;font-size:12px;cursor:pointer;color:#555;}
+.like-btn:hover{background:#fff3f3;border-color:#ff6b6b;color:#ff6b6b;}
+.like-btn.green:hover{background:#f0fff7;border-color:#03c75a;color:#03c75a;}
+
+/* Comments */
+.comments{padding:20px 30px;background:#f9f9f9;border-top:1px solid #e8e8e8;}
+.comment-title{font-size:14px;font-weight:700;color:#333;margin-bottom:12px;}
+.comment-input-wrap{display:flex;gap:8px;}
+.comment-input{flex:1;padding:10px 14px;border:1px solid #ddd;border-radius:6px;font-size:12px;}
+.comment-submit{background:#03c75a;color:white;border:none;padding:0 16px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;}
+
+/* Velocity badge */
+.vel-badge{display:inline-flex;align-items:center;gap:4px;background:#fff3e0;border:1px solid #ffcc80;border-radius:10px;padding:2px 8px;font-size:10px;color:#e65100;font-weight:600;margin-left:8px;}
+</style>
+</head>
+<body>
+
+<div class="naver-shell">
+  <!-- Naver Header -->
+  <div class="naver-header">
+    <span class="naver-logo">NAVER</span>
+    <span style="color:white;font-size:13px">블로그</span>
+    <span class="naver-blog-title">applesodda의 건강한 식탁</span>
+  </div>
+
+  <!-- Blog meta -->
+  <div class="blog-meta-bar">
+    <div class="author-info">
+      <div class="author-avatar">A</div>
+      <div>
+        <div class="author-name">applesodda</div>
+        <div class="post-date">2026. 6. 9. · 조회 1,247</div>
+      </div>
+    </div>
+    <button class="follow-btn">+ 이웃추가</button>
+  </div>
+
+  <!-- Post body -->
+  <div class="post-body">
+
+    <div class="seo-badge">
+      <span>⚡</span> 현재 급상승 키워드 기반 포스팅 · velocity +38%
+    </div>
+
+    <h1 class="post-title">2026년 요즘 뜨는 영양제 추천 TOP 4<br>당뇨·눈건강·콜라겐·오메가3 효능 총정리 🌿</h1>
+
+    <div class="post-tags">
+      <span class="post-tag">#당뇨영양제</span>
+      <span class="post-tag">#눈건강영양제</span>
+      <span class="post-tag">#콜라겐영양제</span>
+      <span class="post-tag">#오메가3추천</span>
+      <span class="post-tag">#건강기능식품</span>
+      <span class="post-tag">#루테인지아잔틴</span>
+      <span class="post-tag">#rTG오메가3</span>
+    </div>
+
+    <!-- Intro -->
+    <div class="intro">
+      요즘 주변에서 영양제 챙기는 분들 정말 많아지셨죠? 🙋‍♀️<br>
+      저도 건강 챙기려고 이것저것 알아보다가, 최근에 정말 <strong>"이건 꼭 챙겨먹어야 하는구나"</strong> 싶은 영양제들을 발견했어요.<br><br>
+      특히 40~50대 건강 걱정되시는 분들이라면 오늘 포스팅 끝까지 읽어보시길 강력 추천드려요 😊<br>
+      요즘 네이버 쇼핑에서 엄청 많이 검색되고 있는 <strong>영양제 4가지</strong>, 효능이랑 고르는 법 아주 쉽게 정리해드릴게요!
+    </div>
+
+    <!-- Product cards overview -->
+    <div class="product-cards">
+      <div class="p-card">
+        <div class="p-badge">⚡ 급상승</div>
+        <div class="p-icon">🩸</div>
+        <div class="p-name">당뇨 영양제</div>
+        <div class="p-desc">혈당 관리 + 인슐린 저항성 개선<br>마그네슘 + 바나바잎 복합 추천</div>
+        <div class="p-point">✓ velocity +38% · Naver 23위</div>
+        <button class="p-cta" onclick="alert('구매 링크로 이동')">최저가 확인하기 →</button>
+      </div>
+      <div class="p-card">
+        <div class="p-badge">⚡ 급상승</div>
+        <div class="p-icon">👁️</div>
+        <div class="p-name">눈건강 영양제</div>
+        <div class="p-desc">루테인 + 지아잔틴 + 아스타잔틴<br>블루라이트 차단 · 황반 보호</div>
+        <div class="p-point">✓ velocity +25% · Naver 41위</div>
+        <button class="p-cta" onclick="alert('구매 링크로 이동')">BEST 상품 보러가기 →</button>
+      </div>
+      <div class="p-card">
+        <div class="p-icon">✨</div>
+        <div class="p-name">콜라겐 영양제</div>
+        <div class="p-desc">저분자 피쉬 콜라겐 + 비타민C<br>피부 탄력 + 관절 건강 동시에!</div>
+        <div class="p-point">✓ velocity +38% · multi-cat 2개</div>
+        <button class="p-cta" onclick="alert('구매 링크로 이동')">가성비 TOP 3 →</button>
+      </div>
+      <div class="p-card">
+        <div class="p-icon">🐟</div>
+        <div class="p-name">오메가3</div>
+        <div class="p-desc">rTG형 · EPA+DHA 1,000mg 이상<br>중성지방 감소 + 혈관 건강</div>
+        <div class="p-point">✓ Naver 5위 · 장기 상위 안정</div>
+        <button class="p-cta" onclick="alert('구매 링크로 이동')">rTG형 최저가 비교 →</button>
+      </div>
+    </div>
+
+    <!-- Section 1 -->
+    <div class="section">
+      <div class="section-h2">1. 당뇨에 좋은 영양제 🩸 <span class="vel-badge">⚡ +38%</span></div>
+      <div class="section-body">
+        <p>당뇨 환자가 국내에만 600만 명 이상이고, "당뇨 전단계"인 분들까지 하면 거의 1,500만 명에 달한다고 해요. 그래서인지 최근 "당뇨 영양제"가 급격히 검색량이 늘어나고 있어요.</p>
+        <table class="info-table">
+          <tr><th>성분</th><th>효능</th><th>하루 권장량</th></tr>
+          <tr><td>바나바잎 추출물</td><td>혈당 수치 안정화</td><td>2~4mg</td></tr>
+          <tr><td>마그네슘</td><td>인슐린 저항성 개선</td><td>300~400mg</td></tr>
+          <tr><td>알파리포산</td><td>신경 손상 예방</td><td>300~600mg</td></tr>
+        </table>
+        <div class="tip-box">구매 포인트: 마그네슘 + 바나바잎 복합 제품을 찾으세요. 단일 성분보다 복합 제품이 시너지 효과가 탁월해요!</div>
+        <div class="cta-wrap">
+          <button class="cta-btn" onclick="alert('당뇨 영양제 구매 페이지로 이동')">지금 당뇨 영양제 최저가 확인하기 <span class="arrow">→</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2 -->
+    <div class="section">
+      <div class="section-h2">2. 눈건강 영양제 👁️ <span class="vel-badge">⚡ +25%</span></div>
+      <div class="section-body">
+        <p>하루 평균 스마트폰 4시간 이상 쓰시는 분 손! 🙋 저도 눈이 너무 피로하고 건조해서 루테인을 꾸준히 먹고 있어요.</p>
+        <table class="info-table">
+          <tr><th>성분</th><th>효과</th><th>추천 함량</th></tr>
+          <tr><td>루테인</td><td>황반 보호, 블루라이트 차단</td><td>20mg</td></tr>
+          <tr><td>지아잔틴</td><td>망막 중심부 보호</td><td>4mg</td></tr>
+          <tr><td>아스타잔틴</td><td>눈 피로 회복 <span class="star">⭐⭐</span></td><td>4~12mg</td></tr>
+        </table>
+        <div class="tip-box">구매 포인트: 루테인 20mg + 지아잔틴 4mg 조합 제품 추천! "아스타잔틴" 추가된 제품이면 더 좋아요 😊</div>
+        <div class="cta-wrap">
+          <button class="cta-btn" onclick="alert('눈건강 영양제 구매 페이지로 이동')">눈건강 영양제 BEST 상품 보러가기 <span class="arrow">→</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3 -->
+    <div class="section">
+      <div class="section-h2">3. 콜라겐 영양제 ✨</div>
+      <div class="section-body">
+        <p>"콜라겐은 피부에만 좋은 거 아닌가요?" 라고 생각하셨다면, 오늘부로 생각 바꾸셔야 해요 😄 콜라겐은 우리 몸 단백질의 30%를 차지하는 필수 성분이에요.</p>
+        <table class="info-table">
+          <tr><th>종류</th><th>흡수율</th><th>추천</th></tr>
+          <tr><td>일반 콜라겐</td><td>낮음</td><td>—</td></tr>
+          <tr><td>저분자(펩타이드)</td><td>높음 <span class="star">⭐</span></td><td>피부+관절</td></tr>
+          <tr><td>피쉬 콜라겐</td><td>매우 높음 <span class="star">⭐⭐</span></td><td>흡수율 최우선</td></tr>
+        </table>
+        <div class="tip-box">구매 포인트: "저분자 콜라겐 펩타이드" 표기 제품 선택! 비타민C 함께 복용하면 흡수율 극대화 👍</div>
+        <div class="cta-wrap">
+          <button class="cta-btn" onclick="alert('콜라겐 구매 페이지로 이동')">콜라겐 영양제 가성비 TOP 3 보기 <span class="arrow">→</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 4 -->
+    <div class="section">
+      <div class="section-h2">4. 오메가3 🐟</div>
+      <div class="section-body">
+        <p>오메가3는 설명이 필요 없을 만큼 유명하죠. 그런데 막상 고르려면 종류가 너무 많아서 헷갈리죠? 😅</p>
+        <table class="info-table">
+          <tr><th>종류</th><th>흡수율</th><th>특징</th></tr>
+          <tr><td>EE형</td><td>60~70%</td><td>가격 저렴</td></tr>
+          <tr><td>TG형</td><td>80~90%</td><td>자연 형태</td></tr>
+          <tr><td>rTG형 <span class="star">⭐⭐</span></td><td>90%+</td><td>순도 최고</td></tr>
+        </table>
+        <div class="tip-box">구매 포인트: rTG형 + EPA/DHA 1,000mg 이상 제품! 냉장 보관 제품은 신선도 보장 💪</div>
+        <div class="cta-wrap">
+          <button class="cta-btn" onclick="alert('오메가3 구매 페이지로 이동')">오메가3 rTG형 최저가 비교 <span class="arrow">→</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Checklist -->
+    <div class="section">
+      <div class="section-h2">🛒 구매 전 꼭 확인하는 체크리스트</div>
+      <div class="checklist">
+        <div class="check-item"><span class="check-icon">✅</span><span>식약처 건강기능식품 인증 마크 확인</span></div>
+        <div class="check-item"><span class="check-icon">✅</span><span>제조사·유통기한이 명확히 표기되어 있는지</span></div>
+        <div class="check-item"><span class="check-icon">✅</span><span>주요 성분 함량이 구체적으로 기재되어 있는지</span></div>
+        <div class="check-item"><span class="check-icon">✅</span><span>합성 첨가물(이산화티타늄 등) 없는지 확인</span></div>
+        <div class="check-item"><span class="check-icon">✅</span><span>1일 섭취량 기준 가격 비교 (총 캡슐 수 ÷ 1일 복용량)</span></div>
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="section">
+      <div class="section-h2">🎁 오늘의 결론 요약</div>
+      <table class="summary-table">
+        <tr><th>고민</th><th>추천 영양제</th><th>구매 링크</th></tr>
+        <tr><td>혈당 관리가 걱정돼요</td><td>당뇨 영양제 (마그네슘+바나바잎)</td><td><button onclick="alert('링크 이동')" style="background:#03c75a;color:white;border:none;padding:4px 12px;border-radius:4px;font-size:11px;cursor:pointer">바로가기</button></td></tr>
+        <tr><td>눈이 피로하고 건조해요</td><td>루테인 + 지아잔틴 복합</td><td><button onclick="alert('링크 이동')" style="background:#03c75a;color:white;border:none;padding:4px 12px;border-radius:4px;font-size:11px;cursor:pointer">바로가기</button></td></tr>
+        <tr><td>피부·관절 모두 챙기고 싶어요</td><td>저분자 피쉬 콜라겐</td><td><button onclick="alert('링크 이동')" style="background:#03c75a;color:white;border:none;padding:4px 12px;border-radius:4px;font-size:11px;cursor:pointer">바로가기</button></td></tr>
+        <tr><td>혈관·중성지방 관리</td><td>rTG형 오메가3</td><td><button onclick="alert('링크 이동')" style="background:#03c75a;color:white;border:none;padding:4px 12px;border-radius:4px;font-size:11px;cursor:pointer">바로가기</button></td></tr>
+      </table>
+    </div>
+
+    <!-- Outro -->
+    <div class="outro">
+      <p>요즘 건강에 대한 관심이 높아지면서 영양제 시장도 정말 커졌어요.<br>
+      그만큼 좋은 제품도 많지만, <strong>잘못 고르면 돈 낭비</strong>가 될 수 있으니<br>
+      오늘 정리해드린 체크리스트 꼭 참고하셔서 똑똑하게 고르세요! 😊<br><br>
+      <strong>궁금한 점은 댓글로 남겨주세요 💬<br>
+      도움이 되셨다면 공감❤️과 이웃추가 부탁드려요~!</strong></p>
+    </div>
+
+    <!-- Like buttons -->
+    <div class="like-section">
+      <button class="like-btn">❤️ 공감 128</button>
+      <button class="like-btn green">➕ 이웃추가</button>
+      <button class="like-btn">🔗 공유하기</button>
+    </div>
+
+    <!-- Next posts suggestion -->
+    <div style="background:#f5f5f5;border-radius:8px;padding:14px 18px;margin-top:10px;">
+      <div style="font-size:12px;font-weight:700;color:#555;margin-bottom:8px;">📌 다음 포스팅 예고 (트렌드 기반)</div>
+      <div style="font-size:12px;color:#1a6fba;line-height:2;cursor:pointer;">
+        ▶ 닭가슴살 고르는 법 + 다이어트 레시피 5가지<br>
+        ▶ 마그네슘 효능·부작용·추천 제품 총정리<br>
+        ▶ 어버이날 건강선물 추천 BEST 5 🎁
+      </div>
+    </div>
+
+  </div><!-- /post-body -->
+
+  <!-- Comments -->
+  <div class="comments">
+    <div class="comment-title">댓글 12개</div>
+    <div class="comment-input-wrap">
+      <input class="comment-input" placeholder="댓글을 입력해주세요...">
+      <button class="comment-submit">등록</button>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

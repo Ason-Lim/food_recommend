@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f8f9fc;color:#1a1a2e;font-size:13px;padding:20px;}
+h2.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);}
+.title{font-size:17px;font-weight:700;margin-bottom:3px;}
+.sub{font-size:12px;color:#778;margin-bottom:18px;}
+
+.tabs{display:flex;gap:4px;margin-bottom:16px;background:white;border-radius:10px;padding:5px;box-shadow:0 1px 4px rgba(0,0,0,.07);flex-wrap:wrap;}
+.tab{padding:6px 13px;border:none;background:transparent;border-radius:7px;font-size:12px;cursor:pointer;color:#556;font-weight:500;}
+.tab.active{background:#1a1a2e;color:white;}
+.pane{display:none;}
+.pane.active{display:block;}
+.section-title{font-size:13px;font-weight:700;color:#334;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #e8edff;}
+
+/* Model cards */
+.model-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.model-card{background:white;border-radius:12px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.07);position:relative;overflow:hidden;}
+.model-card::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;border-radius:4px 0 0 4px;}
+.model-card.gold::before{background:linear-gradient(180deg,#f0a500,#e67e00);}
+.model-card.green::before{background:linear-gradient(180deg,#2e7d32,#1b5e20);}
+.model-card.blue::before{background:linear-gradient(180deg,#1565c0,#0d47a1);}
+.model-card.gray::before{background:#ccc;}
+.model-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;}
+.model-name{font-size:13px;font-weight:700;color:#1a1a2e;}
+.model-rank{font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;}
+.rank-1{background:#fff3cd;color:#856404;}
+.rank-2{background:#d1f2eb;color:#1a6e50;}
+.rank-3{background:#dbeafe;color:#1e40af;}
+.rank-4{background:#f5f5f5;color:#777;}
+.model-revenue{font-size:18px;font-weight:800;margin-bottom:4px;}
+.model-sub{font-size:10px;color:#889;margin-bottom:10px;}
+.model-metrics{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
+.metric{text-align:center;background:#f8f9fc;border-radius:6px;padding:6px 4px;}
+.metric-val{font-size:11px;font-weight:700;}
+.metric-lbl{font-size:9px;color:#889;margin-top:1px;}
+.model-desc{font-size:11px;color:#556;line-height:1.6;margin-top:10px;}
+
+/* Revenue simulation */
+.sim-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:14px;}
+.sim-table th{background:#1a1a2e;color:white;padding:8px 12px;text-align:left;}
+.sim-table th:not(:first-child){text-align:center;}
+.sim-table td{padding:8px 12px;border-bottom:1px solid #f0f2f6;vertical-align:middle;}
+.sim-table td:not(:first-child){text-align:center;}
+.sim-table tr:hover td{background:#fafbff;}
+.won{font-weight:700;}
+.scenario-label{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600;display:inline-block;}
+.sc-low{background:#f5f5f5;color:#666;}
+.sc-mid{background:#e3f2fd;color:#1565c0;}
+.sc-high{background:#e8f5e9;color:#2e7d32;}
+
+/* Revenue bar chart */
+.rev-bars{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
+.rev-row{display:flex;align-items:center;gap:10px;}
+.rev-label{width:130px;font-size:11px;color:#445;text-align:right;flex-shrink:0;}
+.rev-wrap{flex:1;background:#f0f2f6;border-radius:4px;height:22px;position:relative;}
+.rev-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:8px;font-size:10px;font-weight:700;color:white;}
+
+/* Timeline */
+.roadmap-grid{display:grid;grid-template-columns:100px 1fr;gap:0;}
+.rm-phase{padding:12px 10px;font-size:11px;font-weight:700;text-align:center;border-right:2px solid #e8edff;}
+.rm-content{padding:10px 14px;border-bottom:1px solid #f0f2f6;}
+.rm-title{font-size:12px;font-weight:700;margin-bottom:4px;}
+.rm-body{font-size:11px;color:#556;line-height:1.6;}
+.rm-revenue{font-size:12px;font-weight:700;margin-top:6px;}
+
+/* Risk table */
+.risk-grid{display:flex;flex-direction:column;gap:8px;}
+.risk-item{background:white;border-radius:8px;padding:12px 14px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;gap:12px;}
+.risk-level{width:50px;text-align:center;flex-shrink:0;}
+.risk-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;display:inline-block;}
+.risk-high{background:#ffebee;color:#c62828;}
+.risk-mid{background:#fff3e0;color:#e65100;}
+.risk-low{background:#e8f5e9;color:#2e7d32;}
+.risk-body{}
+.risk-name{font-size:12px;font-weight:700;margin-bottom:3px;}
+.risk-desc{font-size:11px;color:#556;line-height:1.5;}
+
+/* Verdict */
+.verdict{background:#1a1a2e;color:white;border-radius:12px;padding:16px 20px;margin-bottom:0;}
+.verdict-title{font-size:14px;font-weight:700;margin-bottom:8px;}
+.verdict-body{font-size:12px;line-height:1.9;color:#ccd;}
+.v-green{color:#4cdf90;font-weight:700;}
+.v-yellow{color:#ffcc80;font-weight:700;}
+.v-red{color:#ff8a80;font-weight:700;}
+</style>
+</head>
+<body>
+<h2 class="sr-only">food-trend-automation 비즈니스 모델 및 수익성 분석</h2>
+<div class="title">💰 비즈니스 모델 & 수익성 분석</div>
+<div class="sub">food-trend-automation 시스템 기반 수익화 전략 평가</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="show('models',this)">📦 비즈니스 모델</button>
+  <button class="tab" onclick="show('simulation',this)">📊 수익 시뮬레이션</button>
+  <button class="tab" onclick="show('roadmap',this)">🗓 수익화 로드맵</button>
+  <button class="tab" onclick="show('risk',this)">⚠️ 리스크</button>
+  <button class="tab" onclick="show('verdict',this)">🎯 최종 판단</button>
+</div>
+
+<!-- ===== MODELS ===== -->
+<div id="pane-models" class="pane active">
+  <div class="section-title">4가지 수익화 모델 비교</div>
+  <div class="model-grid">
+
+    <div class="model-card gold">
+      <div class="model-header">
+        <div>
+          <div class="model-name">① B2B 트렌드 데이터 서비스</div>
+          <div style="font-size:10px;color:#889;margin-top:2px;">식품업체·마케터에게 주간 리포트 구독 판매</div>
+        </div>
+        <span class="model-rank rank-1">★ 1순위</span>
+      </div>
+      <div class="model-revenue" style="color:#e67e00">월 300~1,500만원</div>
+      <div class="model-sub">고객사 3~10곳 × 50~150만원/월</div>
+      <div class="model-metrics">
+        <div class="metric"><div class="metric-val" style="color:#2e7d32">높음</div><div class="metric-lbl">수익성</div></div>
+        <div class="metric"><div class="metric-val" style="color:#1565c0">2~3개월</div><div class="metric-lbl">첫 수익</div></div>
+        <div class="metric"><div class="metric-val" style="color:#2e7d32">낮음</div><div class="metric-lbl">운영 비용</div></div>
+      </div>
+      <div class="model-desc">
+        <b>이 시스템의 핵심 차별화 자산</b>: Naver×Google 교차 velocity 신호는 직접 만들기 어려움.<br>
+        식품 MD, 바이어, 마케터가 "다음 주 뭐 뜰지" 알면 가치 있음.<br>
+        주간 다이제스트(weekly_digest.py)가 이미 설계에 있어 추가 개발 최소.
+      </div>
+    </div>
+
+    <div class="model-card green">
+      <div class="model-header">
+        <div>
+          <div class="model-name">② 스마트스토어 트렌드 큐레이션</div>
+          <div style="font-size:10px;color:#889;margin-top:2px;">velocity burst 키워드로 상품 선발매·기획전 운영</div>
+        </div>
+        <span class="model-rank rank-2">★ 2순위</span>
+      </div>
+      <div class="model-revenue" style="color:#2e7d32">월 100~500만원</div>
+      <div class="model-sub">마진율 20~40% × 월 매출 기준</div>
+      <div class="model-metrics">
+        <div class="metric"><div class="metric-val" style="color:#f0a500">중간</div><div class="metric-lbl">수익성</div></div>
+        <div class="metric"><div class="metric-val" style="color:#2e7d32">1개월</div><div class="metric-lbl">첫 수익</div></div>
+        <div class="metric"><div class="metric-val" style="color:#e65100">재고 필요</div><div class="metric-lbl">운영 비용</div></div>
+      </div>
+      <div class="model-desc">
+        경쟁사 대비 1~3일 빠른 트렌드 파악 = 검색 상위 선점 가능.<br>
+        단, 재고 리스크 존재. 위탁판매(드롭쉬핑) 또는 소량 테스트 후 확대 전략 필요.<br>
+        블로그(applesodda) 트래픽이 쌓이면 스토어 연계 시너지 발생.
+      </div>
+    </div>
+
+    <div class="model-card blue">
+      <div class="model-header">
+        <div>
+          <div class="model-name">③ 블로그 어필리에이트</div>
+          <div style="font-size:10px;color:#889;margin-top:2px;">trending 키워드 SEO 포스팅 → 쿠팡/네이버 커미션</div>
+        </div>
+        <span class="model-rank rank-3">★ 3순위</span>
+      </div>
+      <div class="model-revenue" style="color:#1565c0">월 30~200만원</div>
+      <div class="model-sub">트래픽 성장에 따라 6~12개월 후 본격화</div>
+      <div class="model-metrics">
+        <div class="metric"><div class="metric-val" style="color:#f0a500">중간</div><div class="metric-lbl">수익성</div></div>
+        <div class="metric"><div class="metric-val" style="color:#e65100">3~6개월</div><div class="metric-lbl">첫 수익</div></div>
+        <div class="metric"><div class="metric-val" style="color:#2e7d32">매우 낮음</div><div class="metric-lbl">운영 비용</div></div>
+      </div>
+      <div class="model-desc">
+        velocity burst 키워드 = 지금 막 검색 급증 = SEO 선점 황금 타이밍.<br>
+        Google only 키워드 선점 후 Naver 수요 형성 시 자연 유입 발생.<br>
+        수익 발생까지 시간이 걸리지만 장기적으로 누적 자산이 됨.
+      </div>
+    </div>
+
+    <div class="model-card gray">
+      <div class="model-header">
+        <div>
+          <div class="model-name">④ 대시보드 SaaS 구독</div>
+          <div style="font-size:10px;color:#889;margin-top:2px;">외부 사용자에게 대시보드 접근 권한 판매</div>
+        </div>
+        <span class="model-rank rank-4">4순위</span>
+      </div>
+      <div class="model-revenue" style="color:#888">월 50~300만원</div>
+      <div class="model-sub">사용자 10~30명 × 5~10만원/월 (장기)</div>
+      <div class="model-metrics">
+        <div class="metric"><div class="metric-val" style="color:#f0a500">중간</div><div class="metric-lbl">수익성</div></div>
+        <div class="metric"><div class="metric-val" style="color:#c62828">6개월+</div><div class="metric-lbl">첫 수익</div></div>
+        <div class="metric"><div class="metric-val" style="color:#e65100">인증·인프라</div><div class="metric-lbl">운영 비용</div></div>
+      </div>
+      <div class="model-desc">
+        현재 Streamlit은 내부 분석 도구로 설계됨. 외부 공개하려면 인증·다중 사용자·서버 배포 필요.<br>
+        추가 개발 비용 대비 수익이 낮아 단기에는 비효율.<br>
+        B2B 리포트 서비스 안정화 후 업셀 옵션으로 고려.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SIMULATION ===== -->
+<div id="pane-simulation" class="pane">
+  <div class="section-title">📊 시나리오별 월 수익 시뮬레이션</div>
+
+  <table class="sim-table">
+    <tr>
+      <th>수익원</th>
+      <th>보수적 <span style="font-weight:400;font-size:10px">(6개월 후)</span></th>
+      <th>중간 <span style="font-weight:400;font-size:10px">(12개월 후)</span></th>
+      <th>낙관적 <span style="font-weight:400;font-size:10px">(24개월 후)</span></th>
+    </tr>
+    <tr>
+      <td><b>B2B 리포트 구독</b><br><span style="font-size:10px;color:#889">고객사 수 × 월 단가</span></td>
+      <td><span class="won" style="color:#1565c0">150만원</span><br><span style="font-size:10px;color:#889">3사 × 50만원</span></td>
+      <td><span class="won" style="color:#2e7d32">500만원</span><br><span style="font-size:10px;color:#889">5사 × 100만원</span></td>
+      <td><span class="won" style="color:#e67e00">1,500만원</span><br><span style="font-size:10px;color:#889">10사 × 150만원</span></td>
+    </tr>
+    <tr>
+      <td><b>스마트스토어</b><br><span style="font-size:10px;color:#889">트렌드 상품 큐레이션</span></td>
+      <td><span class="won" style="color:#1565c0">30만원</span><br><span style="font-size:10px;color:#889">초기 운영</span></td>
+      <td><span class="won" style="color:#2e7d32">150만원</span><br><span style="font-size:10px;color:#889">월매출 500만 × 30%</span></td>
+      <td><span class="won" style="color:#e67e00">400만원</span><br><span style="font-size:10px;color:#889">월매출 1,000만 × 40%</span></td>
+    </tr>
+    <tr>
+      <td><b>블로그 어필리에이트</b><br><span style="font-size:10px;color:#889">쿠팡 파트너스 + 네이버</span></td>
+      <td><span class="won" style="color:#1565c0">5만원</span><br><span style="font-size:10px;color:#889">트래픽 초기</span></td>
+      <td><span class="won" style="color:#2e7d32">30만원</span><br><span style="font-size:10px;color:#889">월 방문 5,000명</span></td>
+      <td><span class="won" style="color:#e67e00">150만원</span><br><span style="font-size:10px;color:#889">월 방문 3만명</span></td>
+    </tr>
+    <tr style="background:#f8f9fc;font-weight:700;">
+      <td>합계 (세전)</td>
+      <td><span class="won" style="color:#1565c0;font-size:14px">185만원/월</span></td>
+      <td><span class="won" style="color:#2e7d32;font-size:14px">680만원/월</span></td>
+      <td><span class="won" style="color:#e67e00;font-size:14px">2,050만원/월</span></td>
+    </tr>
+    <tr>
+      <td>연간 환산</td>
+      <td><span style="color:#1565c0">약 2,200만원</span></td>
+      <td><span style="color:#2e7d32">약 8,200만원</span></td>
+      <td><span style="color:#e67e00">약 2.5억원</span></td>
+    </tr>
+  </table>
+
+  <div class="section-title">수익원별 기여도 (중간 시나리오 기준)</div>
+  <div class="rev-bars">
+    <div class="rev-row">
+      <div class="rev-label">B2B 리포트 구독</div>
+      <div class="rev-wrap"><div class="rev-fill" style="width:74%;background:linear-gradient(90deg,#e67e00,#f0a500);">500만원 (74%)</div></div>
+    </div>
+    <div class="rev-row">
+      <div class="rev-label">스마트스토어</div>
+      <div class="rev-wrap"><div class="rev-fill" style="width:22%;background:linear-gradient(90deg,#2e7d32,#43a047);">150만원 (22%)</div></div>
+    </div>
+    <div class="rev-row">
+      <div class="rev-label">블로그 어필리에이트</div>
+      <div class="rev-wrap"><div class="rev-fill" style="width:4%;background:linear-gradient(90deg,#1565c0,#1e88e5);">30만원</div></div>
+    </div>
+  </div>
+
+  <div style="background:#e8f0fe;border-radius:8px;padding:12px 16px;font-size:12px;color:#1a3a7a;line-height:1.7;">
+    <b>핵심 가정</b>: B2B 리포트 단가 50~150만원/월은 현재 식품 데이터 서비스 시장(예: 닐슨, 칸타) 대비 매우 저렴한 수준입니다. 
+    경쟁사 대비 "Naver×Google 교차 velocity 신호"는 독자적 자산이므로 단가 방어가 가능합니다.
+  </div>
+</div>
+
+<!-- ===== ROADMAP ===== -->
+<div id="pane-roadmap" class="pane">
+  <div class="section-title">🗓 수익화 실행 로드맵</div>
+  <div style="background:white;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.07);overflow:hidden;margin-bottom:14px;">
+    <div class="roadmap-grid">
+      <div class="rm-phase" style="background:#e8f5e9;color:#2e7d32;border-bottom:1px solid #f0f2f6;">
+        지금~<br>1개월<br><br>
+        <span style="font-size:10px;font-weight:400">시스템 완성</span>
+      </div>
+      <div class="rm-content">
+        <div class="rm-title">PR-01~09 완성 + 첫 고객 확보</div>
+        <div class="rm-body">
+          • 데이터 수집 파이프라인 안정화<br>
+          • velocity burst → Slack 알림 자동화<br>
+          • 주간 리포트 샘플 3개 직접 작성 (무료 제공)<br>
+          • 식품 MD, 마케터 지인 3~5명에게 무료 베타 제공 → 피드백 수집
+        </div>
+        <div class="rm-revenue" style="color:#889">수익: 0원 (투자 단계)</div>
+      </div>
+    </div>
+    <div class="roadmap-grid">
+      <div class="rm-phase" style="background:#fff3e0;color:#e65100;border-bottom:1px solid #f0f2f6;">
+        1~3개월<br><br>
+        <span style="font-size:10px;font-weight:400">첫 수익</span>
+      </div>
+      <div class="rm-content">
+        <div class="rm-title">B2B 첫 유료 전환 + 블로그 시작</div>
+        <div class="rm-body">
+          • 베타 사용자 중 2~3곳 유료 전환 (월 30~50만원부터 시작)<br>
+          • 블로그 포스팅 주 2~3회 (velocity 키워드 기반 자동 초안 생성)<br>
+          • 스마트스토어 개설 + 상위 3개 트렌드 상품 소량 테스트<br>
+          • 첫 월 리포트 PDF 템플릿 완성
+        </div>
+        <div class="rm-revenue" style="color:#e65100">예상 수익: 50~150만원/월</div>
+      </div>
+    </div>
+    <div class="roadmap-grid">
+      <div class="rm-phase" style="background:#e3f2fd;color:#1565c0;border-bottom:1px solid #f0f2f6;">
+        3~6개월<br><br>
+        <span style="font-size:10px;font-weight:400">성장</span>
+      </div>
+      <div class="rm-content">
+        <div class="rm-title">고객사 확장 + 블로그 SEO 본격화</div>
+        <div class="rm-body">
+          • B2B 고객사 5~8곳으로 확대 (단가 50~100만원)<br>
+          • 블로그 누적 포스팅 50~100개 → 자연 유입 증가<br>
+          • 스마트스토어 위탁판매 구조로 전환 (재고 리스크 제거)<br>
+          • 리포트 자동화 고도화 (weekly_digest + AI 요약 추가)
+        </div>
+        <div class="rm-revenue" style="color:#1565c0">예상 수익: 300~600만원/월</div>
+      </div>
+    </div>
+    <div class="roadmap-grid">
+      <div class="rm-phase" style="background:#f3e5f5;color:#6a1b9a;">
+        6~12개월<br><br>
+        <span style="font-size:10px;font-weight:400">확장</span>
+      </div>
+      <div class="rm-content">
+        <div class="rm-title">수익 다각화 + 시스템 확장</div>
+        <div class="rm-body">
+          • B2B 고객사 10곳+ (단가 인상 가능, 데이터 신뢰도 검증됨)<br>
+          • 블로그 월 방문 1만명+ → 어필리에이트 수익 의미있는 수준<br>
+          • 대시보드 읽기 전용 공유 → 고객 영업 도구<br>
+          • 신규 카테고리(뷰티·헬스케어) 확장 검토
+        </div>
+        <div class="rm-revenue" style="color:#6a1b9a">예상 수익: 500~1,000만원/월</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== RISK ===== -->
+<div id="pane-risk" class="pane">
+  <div class="section-title">⚠️ 비즈니스 리스크 평가</div>
+  <div class="risk-grid">
+    <div class="risk-item">
+      <div class="risk-level"><span class="risk-badge risk-high">높음</span></div>
+      <div class="risk-body">
+        <div class="risk-name">B2B 영업 난이도</div>
+        <div class="risk-desc">식품 대기업 MD·바이어에게 접근하는 것이 생각보다 어렵습니다. 의사결정 사이클이 길고 예산 승인에 시간이 걸립니다. <b>첫 3개월은 중소 식품 브랜드나 지인 네트워크부터 시작해 레퍼런스를 먼저 쌓는 것이 현실적입니다.</b></div>
+      </div>
+    </div>
+    <div class="risk-item">
+      <div class="risk-level"><span class="risk-badge risk-high">높음</span></div>
+      <div class="risk-body">
+        <div class="risk-name">데이터 수집 불안정 → 리포트 품질 훼손</div>
+        <div class="risk-desc">Google rate limiting이나 Naver endpoint 변경으로 수집이 실패하면 유료 고객에게 리포트를 제때 못 보내는 상황이 발생합니다. 수집 실패 시 고객 대응 프로세스와 SLA(Service Level Agreement)를 미리 정의해야 합니다.</div>
+      </div>
+    </div>
+    <div class="risk-item">
+      <div class="risk-level"><span class="risk-badge risk-mid">중간</span></div>
+      <div class="risk-body">
+        <div class="risk-name">경쟁자 진입 가능성</div>
+        <div class="risk-desc">velocity_score × is_naver 교차 신호는 독자적이지만, 아이디어 자체는 복제 가능합니다. 네이버 데이터랩 공개 API + pytrends로 경쟁자가 만들 수 있습니다. 22개 카테고리의 정교한 튜닝과 고객 신뢰가 실질적 장벽이 됩니다.</div>
+      </div>
+    </div>
+    <div class="risk-item">
+      <div class="risk-level"><span class="risk-badge risk-mid">중간</span></div>
+      <div class="risk-body">
+        <div class="risk-name">스마트스토어 재고 리스크</div>
+        <div class="risk-desc">트렌드가 예상보다 빨리 꺼지면 재고가 남습니다. 위탁판매(드롭쉬핑) 방식 또는 소량(10~30개) 테스트 후 리오더 전략으로 초기 재고 리스크를 최소화하세요.</div>
+      </div>
+    </div>
+    <div class="risk-item">
+      <div class="risk-level"><span class="risk-badge risk-low">낮음</span></div>
+      <div class="risk-body">
+        <div class="risk-name">블로그 SEO 성과 불확실성</div>
+        <div class="risk-desc">네이버 블로그 알고리즘 변화로 특정 키워드 노출이 줄어들 수 있습니다. 하지만 velocity burst 키워드를 지속 공략하면 롱테일 포스팅이 꾸준히 누적되어 한두 개가 터지는 구조가 됩니다. 리스크 낮음.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== VERDICT ===== -->
+<div id="pane-verdict" class="pane">
+  <div class="verdict">
+    <div class="verdict-title">🎯 최종 판단</div>
+    <div class="verdict-body">
+      <span class="v-green">이 시스템의 비즈니스 모델 잠재력은 진짜입니다.</span> Naver×Google 교차 velocity 신호는 시장에 없는 독자적 데이터 자산이고, 식품업체 입장에서 "다음 주 뭐 뜰지 미리 아는 것"의 가치는 명확합니다.<br><br>
+      <span class="v-green">가장 빠른 수익 경로: B2B 리포트 구독.</span> 시스템 완성 후 지인 식품 MD 3곳에 무료 베타 제공 → 1~2개월 내 유료 전환. 코드 추가 없이 weekly_digest 자동화만으로 가능합니다.<br><br>
+      <span class="v-yellow">현실적 12개월 목표: 월 500~700만원.</span> B2B 5~7사 × 100만원이 핵심. 블로그와 스마트스토어는 보완적 수익원. 이 목표는 달성 가능한 수준입니다.<br><br>
+      <span class="v-yellow">가장 큰 불확실성은 기술이 아닌 영업입니다.</span> 시스템은 만들 수 있고, AI와 함께 빠르게 완성 가능합니다. 문제는 "월 100만원짜리 리포트를 누가 살 것인가"를 지금부터 검증해야 한다는 점입니다.<br><br>
+      <span class="v-green">권장 순서: 시스템 완성(4~8주) → 무료 베타 3곳 → 유료 전환 → 블로그 병행 → 스마트스토어 소량 테스트</span>
+    </div>
+  </div>
+</div>
+
+<script>
+function show(id,btn){
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('pane-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

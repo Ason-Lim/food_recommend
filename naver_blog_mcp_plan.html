@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f8f9fc;color:#1a1a2e;font-size:13px;padding:20px;}
+h2.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);}
+.title{font-size:17px;font-weight:700;margin-bottom:3px;}
+.sub{font-size:12px;color:#778;margin-bottom:18px;}
+
+.tabs{display:flex;gap:4px;margin-bottom:16px;background:white;border-radius:10px;padding:5px;box-shadow:0 1px 4px rgba(0,0,0,.07);}
+.tab{padding:6px 14px;border:none;background:transparent;border-radius:7px;font-size:12px;cursor:pointer;color:#556;font-weight:500;}
+.tab.active{background:#03c75a;color:white;}
+.pane{display:none;}
+.pane.active{display:block;}
+.section-title{font-size:13px;font-weight:700;color:#334;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #e8edff;}
+
+/* Architecture flow */
+.arch-flow{display:flex;flex-direction:column;gap:0;margin-bottom:16px;}
+.arch-row{display:flex;align-items:stretch;gap:0;}
+.arch-box{background:white;border-radius:10px;padding:14px 16px;flex:1;box-shadow:0 1px 4px rgba(0,0,0,.06);margin:4px;}
+.arch-box .icon{font-size:22px;margin-bottom:6px;}
+.arch-box .lbl{font-size:12px;font-weight:700;margin-bottom:4px;}
+.arch-box .sub{font-size:10px;color:#889;line-height:1.5;}
+.arch-arrow{display:flex;align-items:center;justify-content:center;font-size:18px;color:#aab;padding:0 4px;}
+.arch-arrow.down{flex-direction:column;padding:4px 0;font-size:14px;}
+
+/* Tool cards */
+.tool-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;}
+.tool-card{background:white;border-radius:10px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.06);border-left:4px solid #03c75a;}
+.tool-name{font-family:monospace;font-size:12px;font-weight:700;color:#03c75a;margin-bottom:6px;}
+.tool-desc{font-size:11px;color:#556;line-height:1.5;}
+.tool-param{font-size:10px;font-family:monospace;color:#889;margin-top:4px;}
+
+/* Steps */
+.steps{display:flex;flex-direction:column;gap:0;}
+.step{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #f0f2f6;}
+.step:last-child{border:none;}
+.step-num{width:28px;height:28px;border-radius:50%;background:#03c75a;color:white;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.step-body{}
+.step-title{font-size:12px;font-weight:700;margin-bottom:4px;}
+.step-desc{font-size:11px;color:#556;line-height:1.6;}
+.step-tag{display:inline-block;font-size:10px;padding:2px 8px;border-radius:8px;margin-top:4px;font-weight:600;}
+.tag-ai{background:#e3f2fd;color:#1565c0;}
+.tag-user{background:#fff3e0;color:#e65100;}
+.tag-auto{background:#e8f5e9;color:#2e7d32;}
+
+/* Code block */
+.code-block{background:#1e1e2e;color:#cdd6f4;border-radius:10px;padding:16px;font-family:monospace;font-size:11px;line-height:1.7;overflow-x:auto;margin-bottom:12px;}
+.c-green{color:#a6e3a1;}
+.c-blue{color:#89b4fa;}
+.c-yellow{color:#f9e2af;}
+.c-gray{color:#6c7086;}
+.c-red{color:#f38ba8;}
+.c-purple{color:#cba6f7;}
+
+/* Stack */
+.stack-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:14px;}
+.stack-table th{background:#f5f7fc;color:#556;font-weight:600;padding:8px 12px;text-align:left;border-bottom:2px solid #e0e4ef;}
+.stack-table td{padding:8px 12px;border-bottom:1px solid #f0f2f6;}
+.stack-table tr:hover td{background:#fafbff;}
+.badge{font-size:10px;padding:2px 8px;border-radius:8px;font-weight:600;}
+.b-easy{background:#e8f5e9;color:#2e7d32;}
+.b-med{background:#fff3e0;color:#e65100;}
+
+/* Limitation box */
+.limit-box{background:#fff8e1;border:1px solid #ffe082;border-radius:8px;padding:12px 14px;font-size:11px;color:#7a5c00;line-height:1.7;}
+</style>
+</head>
+<body>
+<h2 class="sr-only">네이버 블로그 MCP 커넥터 개발 계획</h2>
+<div class="title">🔌 네이버 블로그 MCP 커넥터 개발 계획</div>
+<div class="sub">Playwright 브라우저 자동화 기반 · Python MCP SDK</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="show('arch',this)">🏗 아키텍처</button>
+  <button class="tab" onclick="show('tools',this)">🛠 제공 기능</button>
+  <button class="tab" onclick="show('steps',this)">📋 개발 순서</button>
+  <button class="tab" onclick="show('code',this)">💻 코드 구조</button>
+  <button class="tab" onclick="show('stack',this)">📦 기술 스택</button>
+</div>
+
+<!-- ARCH -->
+<div id="pane-arch" class="pane active">
+  <div class="section-title">전체 동작 구조</div>
+  <div style="display:flex;align-items:center;gap:6px;margin-bottom:16px;flex-wrap:wrap;">
+    <div style="background:white;border-radius:10px;padding:12px 16px;box-shadow:0 1px 4px rgba(0,0,0,.06);text-align:center;min-width:110px;">
+      <div style="font-size:20px;margin-bottom:4px;">🤖</div>
+      <div style="font-size:11px;font-weight:700;">Claude (Cowork)</div>
+      <div style="font-size:10px;color:#889;">글 내용 생성</div>
+    </div>
+    <div style="font-size:18px;color:#aab;">→</div>
+    <div style="background:#e8f5e9;border-radius:10px;padding:12px 16px;box-shadow:0 1px 4px rgba(0,0,0,.06);text-align:center;min-width:130px;border:2px solid #03c75a;">
+      <div style="font-size:20px;margin-bottom:4px;">🔌</div>
+      <div style="font-size:11px;font-weight:700;color:#03c75a;">Naver Blog MCP</div>
+      <div style="font-size:10px;color:#556;">write_post() 호출</div>
+    </div>
+    <div style="font-size:18px;color:#aab;">→</div>
+    <div style="background:white;border-radius:10px;padding:12px 16px;box-shadow:0 1px 4px rgba(0,0,0,.06);text-align:center;min-width:110px;">
+      <div style="font-size:20px;margin-bottom:4px;">🎭</div>
+      <div style="font-size:11px;font-weight:700;">Playwright</div>
+      <div style="font-size:10px;color:#889;">브라우저 자동화</div>
+    </div>
+    <div style="font-size:18px;color:#aab;">→</div>
+    <div style="background:white;border-radius:10px;padding:12px 16px;box-shadow:0 1px 4px rgba(0,0,0,.06);text-align:center;min-width:110px;">
+      <div style="font-size:20px;margin-bottom:4px;">🟢</div>
+      <div style="font-size:11px;font-weight:700;">네이버 블로그</div>
+      <div style="font-size:10px;color:#889;">자동 발행</div>
+    </div>
+  </div>
+
+  <div class="section-title">인증 방식</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+    <div style="background:white;border-radius:10px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.06);border-left:4px solid #03c75a;">
+      <div style="font-size:12px;font-weight:700;margin-bottom:6px;">✅ 방법 A: 쿠키 세션 (추천)</div>
+      <div style="font-size:11px;color:#556;line-height:1.7;">
+        1. 최초 1회: 사용자가 직접 브라우저 로그인<br>
+        2. 세션 쿠키를 <code style="background:#f5f5f5;padding:1px 4px;border-radius:3px;">~/.naver_session.json</code>에 저장<br>
+        3. 이후 MCP가 저장된 쿠키로 자동 인증<br>
+        4. 쿠키 만료 시 재로그인 안내
+      </div>
+    </div>
+    <div style="background:white;border-radius:10px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.06);border-left:4px solid #aab;">
+      <div style="font-size:12px;font-weight:700;margin-bottom:6px;color:#778;">방법 B: 환경변수 자격증명</div>
+      <div style="font-size:11px;color:#889;line-height:1.7;">
+        .env에 ID/PW 저장 → 매번 자동 로그인.<br>
+        편리하지만 CAPTCHA/보안 인증에 걸릴 수 있음.<br>
+        네이버의 비정상 로그인 감지 가능성 있음.<br>
+        → 방법 A가 더 안정적
+      </div>
+    </div>
+  </div>
+
+  <div class="limit-box">
+    ⚠️ <b>주의</b>: 네이버 공식 블로그 작성 API가 없으므로 이 MCP는 브라우저 UI를 자동화합니다. 네이버가 에디터 구조를 변경하면 일부 기능이 깨질 수 있습니다. 이미지 첨부는 로컬 파일 경로 기반으로 동작합니다.
+  </div>
+</div>
+
+<!-- TOOLS -->
+<div id="pane-tools" class="pane">
+  <div class="section-title">MCP가 제공할 도구 (Tool) 목록</div>
+  <div class="tool-grid">
+    <div class="tool-card">
+      <div class="tool-name">write_post()</div>
+      <div class="tool-desc">새 글 작성 및 발행. 제목·본문·태그·카테고리·발행 여부(임시저장/발행) 설정 가능.</div>
+      <div class="tool-param">title, content, tags[], category, publish=True</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">get_posts()</div>
+      <div class="tool-desc">블로그의 최근 글 목록 조회. 제목, URL, 작성일, 조회수 반환.</div>
+      <div class="tool-param">limit=10, page=1</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">edit_post()</div>
+      <div class="tool-desc">기존 글 수정. post_id로 특정 글을 찾아 내용 업데이트.</div>
+      <div class="tool-param">post_id, title?, content?, tags?</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">upload_image()</div>
+      <div class="tool-desc">로컬 이미지 파일을 블로그에 업로드하고 본문 삽입 가능한 URL 반환.</div>
+      <div class="tool-param">image_path, alt_text?</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">get_categories()</div>
+      <div class="tool-desc">블로그의 카테고리 목록 조회. write_post의 category 파라미터에 사용.</div>
+      <div class="tool-param">(no params)</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">save_draft()</div>
+      <div class="tool-desc">글을 임시저장. 바로 발행하지 않고 초안으로 저장 후 수동 발행 가능.</div>
+      <div class="tool-param">title, content, tags[]</div>
+    </div>
+  </div>
+
+  <div style="background:#e8f5e9;border-radius:8px;padding:12px 14px;font-size:11px;color:#1a5c30;line-height:1.8;">
+    <b>활용 예시:</b><br>
+    food-trend-automation에서 velocity burst 감지 → Claude가 블로그 초안 자동 생성 → <code>write_post()</code> 호출 → 네이버 블로그 자동 발행까지 완전 자동화 가능
+  </div>
+</div>
+
+<!-- STEPS -->
+<div id="pane-steps" class="pane">
+  <div class="section-title">개발 순서 (AI와 함께 · 약 1~2일)</div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">환경 세팅</div>
+        <div class="step-desc">Python 3.11+, uv, Playwright, mcp SDK 설치. 프로젝트 스캐폴딩 생성.</div>
+        <span class="step-tag tag-ai">Claude가 작성</span>
+        <span class="step-tag tag-auto">약 10분</span>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">네이버 로그인 + 세션 저장</div>
+        <div class="step-desc">Playwright로 naver.com 로그인 → 쿠키를 JSON 파일에 저장. 이후 재사용.</div>
+        <span class="step-tag tag-user">사용자 최초 1회 로그인</span>
+        <span class="step-tag tag-ai">코드: Claude 작성</span>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">write_post() 핵심 기능 구현</div>
+        <div class="step-desc">블로그 에디터 URL 접근 → 제목/본문 입력 → 태그 추가 → 발행 버튼 클릭. DOM 셀렉터 파악이 핵심.</div>
+        <span class="step-tag tag-ai">Claude가 작성 + 디버깅</span>
+        <span class="step-tag tag-auto">약 2~4시간</span>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <div class="step-title">MCP 서버로 래핑</div>
+        <div class="step-desc">fastmcp 또는 mcp Python SDK로 Tool 등록. Claude가 호출할 수 있는 MCP 서버 완성.</div>
+        <span class="step-tag tag-ai">Claude가 작성</span>
+        <span class="step-tag tag-auto">약 1~2시간</span>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <div class="step-title">Cowork에 플러그인 등록</div>
+        <div class="step-desc">claude_desktop_config.json (또는 Cowork 플러그인 설정)에 MCP 서버 경로 추가 → Claude에서 바로 호출 가능.</div>
+        <span class="step-tag tag-user">사용자 설정 파일 수정</span>
+        <span class="step-tag tag-ai">가이드: Claude 제공</span>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <div class="step-title">테스트 + 임시저장 검증</div>
+        <div class="step-desc">save_draft()로 먼저 임시저장 → 블로그에서 확인 → 정상이면 발행. get_posts()로 결과 조회.</div>
+        <span class="step-tag tag-user">사용자 검증</span>
+        <span class="step-tag tag-auto">약 30분</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CODE -->
+<div id="pane-code" class="pane">
+  <div class="section-title">핵심 코드 구조 미리보기</div>
+  <div class="code-block"><span class="c-gray"># naver_blog_mcp/server.py</span>
+<span class="c-purple">from</span> <span class="c-blue">mcp.server.fastmcp</span> <span class="c-purple">import</span> FastMCP
+<span class="c-purple">from</span> <span class="c-blue">playwright.async_api</span> <span class="c-purple">import</span> async_playwright
+<span class="c-purple">import</span> <span class="c-blue">json, os</span>
+
+mcp = FastMCP(<span class="c-yellow">"naver-blog"</span>)
+SESSION_FILE = <span class="c-yellow">os.path.expanduser("~/.naver_session.json")</span>
+
+<span class="c-green">@mcp.tool()</span>
+<span class="c-purple">async def</span> <span class="c-blue">write_post</span>(
+    title: str,
+    content: str,
+    tags: list[str] = [],
+    category: str = <span class="c-yellow">""</span>,
+    publish: bool = <span class="c-red">True</span>
+) -> str:
+    <span class="c-yellow">"""네이버 블로그에 새 글을 작성하고 발행합니다."""</span>
+    <span class="c-purple">async with</span> async_playwright() <span class="c-purple">as</span> p:
+        browser = <span class="c-purple">await</span> p.chromium.launch(headless=<span class="c-red">True</span>)
+        ctx = <span class="c-purple">await</span> browser.new_context()
+        <span class="c-gray"># 저장된 세션 쿠키 로드</span>
+        <span class="c-purple">await</span> ctx.add_cookies(json.load(open(SESSION_FILE)))
+        page = <span class="c-purple">await</span> ctx.new_page()
+        <span class="c-purple">await</span> page.goto(<span class="c-yellow">"https://blog.naver.com/applesodda/postwrite"</span>)
+        <span class="c-gray"># 제목 입력</span>
+        <span class="c-purple">await</span> page.fill(<span class="c-yellow">'[placeholder="제목"]'</span>, title)
+        <span class="c-gray"># 본문 입력 (스마트에디터 iframe)</span>
+        <span class="c-purple">await</span> page.frame_locator(<span class="c-yellow">"#mainFrame"</span>).locator(<span class="c-yellow">".se-content"</span>).fill(content)
+        <span class="c-gray"># 태그 추가</span>
+        <span class="c-purple">for</span> tag <span class="c-purple">in</span> tags:
+            <span class="c-purple">await</span> page.fill(<span class="c-yellow">'[placeholder="태그 입력"]'</span>, tag)
+            <span class="c-purple">await</span> page.keyboard.press(<span class="c-yellow">"Enter"</span>)
+        <span class="c-gray"># 발행 또는 임시저장</span>
+        btn = <span class="c-yellow">"발행"</span> <span class="c-purple">if</span> publish <span class="c-purple">else</span> <span class="c-yellow">"임시저장"</span>
+        <span class="c-purple">await</span> page.click(f<span class="c-yellow">'button:has-text("{btn}")'</span>)
+        <span class="c-purple">return</span> <span class="c-yellow">f"✅ '{title}' 발행 완료"</span>
+
+<span class="c-green">@mcp.tool()</span>
+<span class="c-purple">async def</span> <span class="c-blue">get_posts</span>(limit: int = <span class="c-red">10</span>) -> list[dict]:
+    <span class="c-yellow">"""블로그 최근 글 목록을 반환합니다."""</span>
+    ...
+
+<span class="c-purple">if</span> __name__ == <span class="c-yellow">"__main__"</span>:
+    mcp.run(transport=<span class="c-yellow">"stdio"</span>)</div>
+
+  <div class="section-title">Cowork 플러그인 등록 설정</div>
+  <div class="code-block"><span class="c-gray"># claude_desktop_config.json에 추가</span>
+{
+  <span class="c-yellow">"mcpServers"</span>: {
+    <span class="c-yellow">"naver-blog"</span>: {
+      <span class="c-blue">"command"</span>: <span class="c-yellow">"uv"</span>,
+      <span class="c-blue">"args"</span>: [<span class="c-yellow">"run"</span>, <span class="c-yellow">"python"</span>, <span class="c-yellow">"-m"</span>, <span class="c-yellow">"naver_blog_mcp.server"</span>],
+      <span class="c-blue">"cwd"</span>: <span class="c-yellow">"/Users/mom/naver-blog-mcp"</span>
+    }
+  }
+}</div>
+</div>
+
+<!-- STACK -->
+<div id="pane-stack" class="pane">
+  <div class="section-title">기술 스택</div>
+  <table class="stack-table">
+    <tr><th>항목</th><th>선택</th><th>이유</th><th>난이도</th></tr>
+    <tr><td>언어</td><td>Python 3.11+</td><td>기존 food-trend-automation과 동일</td><td><span class="badge b-easy">쉬움</span></td></tr>
+    <tr><td>MCP 프레임워크</td><td>fastmcp</td><td>Tool 등록이 데코레이터 한 줄</td><td><span class="badge b-easy">쉬움</span></td></tr>
+    <tr><td>브라우저 자동화</td><td>Playwright (async)</td><td>Selenium보다 안정적, headless 지원</td><td><span class="badge b-easy">쉬움</span></td></tr>
+    <tr><td>패키지 관리</td><td>uv</td><td>기존 프로젝트와 동일</td><td><span class="badge b-easy">쉬움</span></td></tr>
+    <tr><td>세션 저장</td><td>JSON 파일 (~/.naver_session.json)</td><td>단순, 안전</td><td><span class="badge b-easy">쉬움</span></td></tr>
+    <tr><td>DOM 셀렉터 파악</td><td>브라우저 DevTools</td><td>네이버 스마트에디터 iframe 구조 파악 필요</td><td><span class="badge b-med">중간</span></td></tr>
+  </table>
+
+  <div style="background:#e3f2fd;border-radius:8px;padding:12px 14px;font-size:12px;color:#1a3a7a;line-height:1.8;margin-top:4px;">
+    <b>예상 개발 시간 (AI 협업 기준)</b><br>
+    환경 세팅 + write_post() 핵심 구현 + MCP 등록까지 <b>반나절~하루</b>.<br>
+    네이버 스마트에디터의 iframe 구조가 가장 까다로운 부분이며, 실제 DOM을 보면서 함께 디버깅해야 합니다.
+  </div>
+</div>
+
+<script>
+function show(id,btn){
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('pane-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

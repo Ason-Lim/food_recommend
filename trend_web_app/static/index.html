@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍏 애플소다 트렌드 & 브랜드커넥트 파트너</title>
+    <!-- Modern Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Styled CSS Stylesheet -->
+    <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="brand">
+                <span class="logo-emoji">🍏</span>
+                <div class="brand-text">
+                    <h2>애플소다</h2>
+                    <p>식품 트렌드 자동화</p>
+                </div>
+            </div>
+
+            <nav class="navigation">
+                <button class="nav-item active" data-tab="trends-tab">
+                    <span class="nav-icon">📊</span> 트렌드 분석기
+                </button>
+                <button class="nav-item" data-tab="links-tab">
+                    <span class="nav-icon">🔗</span> 브랜드커넥트 링크
+                </button>
+                <button class="nav-item" data-tab="blog-tab">
+                    <span class="nav-icon">✍️</span> 블로그 에디터
+                </button>
+                <button class="nav-item" data-tab="compliance-tab">
+                    <span class="nav-icon">🛡️</span> 준수 사항 & 가이드
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="settings-box">
+                    <h3>⚙️ 설정 및 상태</h3>
+                    <div class="setting-item">
+                        <label for="creator-id-input">크리에이터 ID</label>
+                        <input type="text" id="creator-id-input" value="971564859961248" placeholder="숫자 ID 입력">
+                    </div>
+                    <div class="status-indicator">
+                        <span class="status-dot" id="naver-status-dot"></span>
+                        <span class="status-lbl">Naver DataLab API</span>
+                    </div>
+                    <div class="status-indicator">
+                        <span class="status-dot" id="anthropic-status-dot"></span>
+                        <span class="status-lbl">Anthropic Claude API</span>
+                    </div>
+                </div>
+                <div class="footer-note">
+                    <p>Designed for Naver Brand Connect</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="workspace">
+            <header class="top-header">
+                <div class="header-left">
+                    <h1 id="page-title">식품 트렌드 분석 및 검증</h1>
+                    <p id="page-subtitle">네이버 쇼핑 데이터랩을 기반으로 검색 상승 속도(velocity)를 실시간 판별합니다.</p>
+                </div>
+                <div class="header-right">
+                    <div class="date-badge">
+                        <span id="current-date">2026-07-09</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- TAB 1: Trends Analyzer -->
+            <section id="trends-tab" class="tab-content active">
+                <div class="toolbar">
+                    <div class="tool-left">
+                        <button class="btn btn-primary" id="btn-run-analysis">
+                            <span class="btn-icon">⚡</span> 데이터랩 트렌드 분석 시작
+                        </button>
+                        <div class="loader-container" id="trends-loader">
+                            <div class="spinner"></div>
+                            <span>트렌드 데이터 수집 및 데이터랩 검증 중...</span>
+                        </div>
+                    </div>
+                    <div class="tool-right">
+                        <div class="custom-kw-input">
+                            <input type="text" id="custom-keywords" placeholder="직접 분석할 키워드 입력 (쉼표 구분)">
+                            <button class="btn btn-secondary" id="btn-add-custom">검색</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive SVG Charts and Trends list -->
+                <div class="analyzer-grid">
+                    <div class="card chart-card">
+                        <div class="card-header">
+                            <h3>📈 네이버 쇼핑 클릭 트렌드 비율 (최근 30일)</h3>
+                            <p class="card-subtitle">선택한 키워드의 상대적 클릭 추이를 비교합니다.</p>
+                        </div>
+                        <div class="chart-container">
+                            <svg id="trend-svg-chart" viewBox="0 0 600 240">
+                                <!-- Default background graph elements -->
+                                <line x1="50" y1="20" x2="580" y2="20" stroke="#f0f2f5" stroke-width="1"/>
+                                <line x1="50" y1="75" x2="580" y2="75" stroke="#f0f2f5" stroke-width="1"/>
+                                <line x1="50" y1="130" x2="580" y2="130" stroke="#f0f2f5" stroke-width="1"/>
+                                <line x1="50" y1="185" x2="580" y2="185" stroke="#f0f2f5" stroke-width="1"/>
+                                <line x1="50" y1="185" x2="580" y2="185" stroke="#e1e4e9" stroke-width="1.5"/>
+                                <line x1="50" y1="20" x2="50" y2="185" stroke="#e1e4e9" stroke-width="1.5"/>
+                                <text x="15" y="25" class="chart-text" fill="#889">100</text>
+                                <text x="15" y="105" class="chart-text" fill="#889">50</text>
+                                <text x="20" y="188" class="chart-text" fill="#889">0</text>
+                                <text x="300" y="110" text-anchor="middle" fill="#aaa" id="chart-placeholder">키워드를 선택하여 차트를 그리세요</text>
+                            </svg>
+                            <div class="chart-legend" id="chart-legend-box"></div>
+                        </div>
+                    </div>
+
+                    <div class="card list-card">
+                        <div class="card-header">
+                            <h3>🔥 발굴된 인기 & 급상승 키워드</h3>
+                            <p class="card-subtitle">Velocity(상승 속도)가 1.0 이상인 키워드는 진짜 상승세인 키워드입니다.</p>
+                        </div>
+                        <div class="table-wrapper">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>키워드</th>
+                                        <th>상승 속도 (Vel)</th>
+                                        <th>로컬 점수</th>
+                                        <th>신규 여부</th>
+                                        <th>동작</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="trends-table-body">
+                                    <tr>
+                                        <td colspan="5" class="empty-table">상단 "트렌드 분석 시작" 버튼을 클릭하여 데이터를 분석해 주세요.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: Brand Connect Links Mapper -->
+            <section id="links-tab" class="tab-content">
+                <div class="card mapper-card">
+                    <div class="card-header">
+                        <h3>🛒 크롬 확장 프로그램을 활용한 제휴 링크 매핑</h3>
+                        <p class="card-subtitle">
+                            크롬 확장 프로그램 <strong>'네이버 브랜드 커넥트 검색'</strong> 기능을 함께 활용합니다. <br>
+                            키워드를 복사한 뒤, 확장 프로그램을 열고 상품을 검색하여 발급된 링크를 아래에 입력해 주세요.
+                        </p>
+                    </div>
+
+                    <div class="mapper-body">
+                        <div class="mapper-list" id="mapper-keywords-list">
+                            <div class="empty-mapper">선택된 키워드가 없습니다. 트렌드 분석기 탭에서 키워드를 추가해 주세요.</div>
+                        </div>
+
+                        <div class="mapper-actions">
+                            <button class="btn btn-primary" id="btn-go-to-blog" disabled>
+                                ✍️ 블로그 에디터 탭으로 이동
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: AI Blog Composer -->
+            <section id="blog-tab" class="tab-content">
+                <div class="blog-composer-layout">
+                    <div class="composer-sidebar">
+                        <div class="card composer-params-card">
+                            <div class="card-header">
+                                <h3>📝 블로그 설정</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="blog-title-input">포스팅 제목 힌트</label>
+                                    <input type="text" id="blog-title-input" placeholder="비워둘 시 자동 작성">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ai-model-select">AI 작가 모델</label>
+                                    <select id="ai-model-select">
+                                        <option value="claude-3-5-sonnet-20260229" selected>Claude 3.5 Sonnet (추천)</option>
+                                        <option value="claude-3-haiku-20240307">Claude 3 Haiku (빠름)</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mapped-summary-box">
+                                    <h4>🔗 삽입될 키워드 및 링크</h4>
+                                    <ul id="mapped-links-summary">
+                                        <li class="summary-empty">등록된 링크가 없습니다.</li>
+                                    </ul>
+                                </div>
+
+                                <button class="btn btn-primary btn-block" id="btn-generate-blog" disabled>
+                                    🚀 AI 블로그 원고 작성
+                                </button>
+                                <div class="loader-container" id="blog-loader">
+                                    <div class="spinner"></div>
+                                    <span>원고 초안 생성 중... (약 15~30초)</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card guard-preview-card">
+                            <div class="card-header">
+                                <h3>🛡️ 브랜드 커넥트 정책 자동 진단</h3>
+                            </div>
+                            <div class="card-body">
+                                <ul class="compliance-checklist">
+                                    <li class="check-item pending" id="chk-disclosure">
+                                        <span class="check-icon">❔</span>
+                                        <div class="check-text">
+                                            <h5>대가성 문구 노출</h5>
+                                            <p>원고 최상단에 대가성 표기 문구 노출 여부</p>
+                                        </div>
+                                    </li>
+                                    <li class="check-item pending" id="chk-advertising">
+                                        <span class="check-icon">⚠️</span>
+                                        <div class="check-text">
+                                            <h5>표시광고법 가이드</h5>
+                                            <p>과장 및 허위 약리 효능 작성 금지 가이드 적용</p>
+                                        </div>
+                                    </li>
+                                    <li class="check-item pending" id="chk-duration">
+                                        <span class="check-icon">⚠️</span>
+                                        <div class="check-text">
+                                            <h5>전체공개 유지 규정</h5>
+                                            <p>기간 내 전체공개 관련 주의 경고 포함</p>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="composer-main">
+                        <div class="card preview-card">
+                            <div class="card-header">
+                                <h3>✍️ 작성된 블로그 초안 원고</h3>
+                                <div class="preview-actions">
+                                    <button class="btn btn-secondary btn-sm" id="btn-copy-markdown">마크다운 복사</button>
+                                    <button class="btn btn-secondary btn-sm" id="btn-copy-raw">전체 텍스트 복사</button>
+                                </div>
+                            </div>
+                            <div class="markdown-preview-container" id="markdown-preview">
+                                <div class="preview-placeholder">
+                                    <span class="placeholder-icon">📝</span>
+                                    <p>입력 양식을 채우고 "AI 블로그 원고 작성"을 클릭하면 여기에 원고가 생성됩니다.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: Compliance Guard Info -->
+            <section id="compliance-tab" class="tab-content">
+                <div class="compliance-info-layout">
+                    <div class="card info-card border-green">
+                        <div class="card-header">
+                            <h3>🚨 브랜드 커넥트 운영 정책 및 유의사항</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="compliance-section">
+                                <h4>1. 대가성 문구 필수 표기</h4>
+                                <p>쇼핑 커넥트 링크나 현금 리워드가 포함된 제휴 콘텐츠를 작성할 때는 공정거래위원회의 지침에 따라 대가성 문구를 반드시 본문의 최상단 등 알아보기 쉬운 곳에 삽입해야 합니다.</p>
+                                <div class="highlight-box">
+                                    <strong>예시 문구:</strong><br>
+                                    "이 포스팅은 네이버 쇼핑 커넥트 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다."
+                                </div>
+                            </div>
+
+                            <div class="compliance-section">
+                                <h4>2. 표시광고법 준수</h4>
+                                <p>추천·보증 등에 관한 표시·광고 심사지침 등 관련 법령을 철저히 준수해야 하며, 특히 <strong>허위 과장 광고를 유의</strong>해야 합니다.</p>
+                                <ul>
+                                    <li>의학적 기능이 검증되지 않은 일반 가공식품을 질병 치료에 효능이 있는 것처럼 홍보하는 행위 엄격 금지</li>
+                                    <li>개인의 주관적 의견을 객관적 사실인 것처럼 과장하는 행위 주의</li>
+                                </ul>
+                            </div>
+
+                            <div class="compliance-section">
+                                <h4>3. 콘텐츠 유지 기간</h4>
+                                <p>제휴 콘텐츠는 캠페인사와 협의한 게재 기간 동안 제3자가 상시 열람할 수 있도록 <strong>전체 공개 상태를 항상 유지</strong>해야 합니다.</p>
+                            </div>
+
+                            <div class="compliance-section">
+                                <h4>4. 캠페인 제안 수락 및 거절</h4>
+                                <p>캠페인 제안 수락 및 거절 시 취소가 절대 불가능하므로, 상세 단가와 제공 요건 등의 조건을 꼼꼼히 확인하고 신중하게 수락해야 합니다.</p>
+                            </div>
+
+                            <div class="compliance-section">
+                                <h4>5. 페널티 제도</h4>
+                                <p>캠페인 규정 위반 시 <strong>옐로우, 오렌지, 레드 형태의 경고가 순차적으로 발생</strong>하며, 운영 정책에 따라 일정 기간 브랜드 커넥트 이용 자격이 제한될 수 있습니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Application Javascript File -->
+    <script src="static/app.js"></script>
+</body>
+</html>

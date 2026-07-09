@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🍏 식품 트렌드 자동화 대시보드</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background: #f0f2f6; color: #1a1a2e; font-size: 14px; }
+
+  /* Layout */
+  .app { display: flex; flex-direction: column; height: 100vh; }
+  .header { background: #1a1a2e; color: white; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+  .body { display: flex; flex: 1; overflow: hidden; }
+  .sidebar { width: 240px; background: white; border-right: 1px solid #e0e4ef; padding: 16px 12px; overflow-y: auto; flex-shrink: 0; }
+  .main { flex: 1; overflow-y: auto; padding: 20px; }
+
+  /* Header */
+  .header-left h1 { font-size: 18px; font-weight: 700; }
+  .header-left .sub { font-size: 11px; color: #aab; margin-top: 2px; }
+  .header-right { display: flex; align-items: center; gap: 12px; }
+  .badge-ok { background: #1a7f4e; color: #a0f0c0; font-size: 11px; padding: 4px 10px; border-radius: 20px; }
+  .badge-warn { background: #7f4a00; color: #ffc87a; font-size: 11px; padding: 4px 10px; border-radius: 20px; }
+  .toggle-live { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #ccd; cursor: pointer; }
+  .toggle-dot { width: 28px; height: 16px; background: #4caf82; border-radius: 8px; position: relative; }
+  .toggle-dot::after { content:''; position:absolute; width:12px;height:12px;background:white;border-radius:50%;top:2px;left:14px;transition:.2s; }
+  .btn-sm { background: #2d4a7a; color: white; border: none; padding: 5px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+  .btn-sm:hover { background: #3a5fa0; }
+
+  /* Sidebar */
+  .sb-section { margin-bottom: 16px; }
+  .sb-label { font-size: 11px; font-weight: 600; color: #667; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+  .date-presets { display: flex; flex-wrap: wrap; gap: 4px; }
+  .date-btn { padding: 3px 8px; border: 1px solid #d0d5e8; border-radius: 4px; font-size: 11px; cursor: pointer; background: white; }
+  .date-btn.active { background: #1a4fa0; color: white; border-color: #1a4fa0; }
+  .sb-input { width: 100%; padding: 6px 8px; border: 1px solid #d0d5e8; border-radius: 6px; font-size: 12px; margin-bottom: 8px; }
+  .sb-select { width: 100%; padding: 5px 8px; border: 1px solid #d0d5e8; border-radius: 6px; font-size: 12px; margin-bottom: 8px; background: white; }
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; font-size: 12px; }
+  .mini-toggle { width: 32px; height: 18px; background: #1a7f4e; border-radius: 9px; position: relative; cursor: pointer; }
+  .mini-toggle::after { content:'';position:absolute;width:14px;height:14px;background:white;border-radius:50%;top:2px;left:16px;transition:.2s; }
+  .mini-toggle.off { background: #ccd; }
+  .mini-toggle.off::after { left: 2px; }
+  .slider-val { font-size: 11px; color: #445; margin-bottom: 2px; text-align: right; }
+  input[type=range] { width: 100%; margin-bottom: 8px; accent-color: #1a4fa0; }
+  .btn-apply { width: 100%; background: #1a4fa0; color: white; border: none; padding: 7px; border-radius: 6px; font-size: 13px; cursor: pointer; margin-bottom: 6px; }
+  .btn-apply:hover { background: #1a5fc0; }
+  .btn-reset { width: 100%; background: white; color: #556; border: 1px solid #d0d5e8; padding: 6px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+
+  /* Nav */
+  .nav-bar { display: flex; gap: 4px; margin-bottom: 16px; background: white; border-radius: 10px; padding: 6px; box-shadow: 0 1px 4px rgba(0,0,0,.07); }
+  .nav-btn { padding: 7px 14px; border: none; background: transparent; border-radius: 7px; font-size: 13px; cursor: pointer; color: #445; font-weight: 500; white-space: nowrap; }
+  .nav-btn.active { background: #1a4fa0; color: white; }
+  .nav-btn:hover:not(.active) { background: #f0f2f8; }
+
+  /* Views */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* KPI Cards */
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+  .kpi-card { background: white; border-radius: 10px; padding: 14px 16px; box-shadow: 0 1px 4px rgba(0,0,0,.07); }
+  .kpi-label { font-size: 11px; color: #778; margin-bottom: 4px; }
+  .kpi-val { font-size: 22px; font-weight: 700; color: #1a1a2e; }
+  .kpi-sub { font-size: 11px; color: #999; margin-top: 2px; }
+  .kpi-up { color: #1a7f4e; }
+  .kpi-down { color: #c0392b; }
+
+  /* Charts */
+  .chart-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .card { background: white; border-radius: 10px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.07); }
+  .card-title { font-size: 13px; font-weight: 600; color: #334; margin-bottom: 12px; }
+
+  /* Bar chart */
+  .bar-chart { display: flex; flex-direction: column; gap: 7px; }
+  .bar-row { display: flex; align-items: center; gap: 8px; }
+  .bar-label { width: 110px; font-size: 12px; text-align: right; color: #445; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar-wrap { flex: 1; background: #f0f2f6; border-radius: 4px; height: 20px; position: relative; }
+  .bar-fill { height: 100%; border-radius: 4px; transition: width .3s; }
+  .bar-fill.naver { background: linear-gradient(90deg, #1a7f4e, #2ecc85); }
+  .bar-fill.non-naver { background: #c0cfe8; }
+  .bar-val { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); font-size: 10px; font-weight: 600; color: #334; }
+  .badge { font-size: 10px; padding: 2px 6px; border-radius: 10px; font-weight: 600; }
+  .badge-v { background: #fff3e0; color: #e65100; }
+  .badge-c { background: #e3f0ff; color: #1a4fa0; }
+
+  /* Pie chart */
+  .pie-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .pie-legend { width: 100%; }
+  .pie-item { display: flex; align-items: center; gap: 6px; font-size: 11px; margin-bottom: 4px; }
+  .pie-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+  /* Table */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .data-table th { background: #f5f7fc; color: #556; font-weight: 600; padding: 8px 10px; text-align: left; border-bottom: 2px solid #e0e4ef; white-space: nowrap; }
+  .data-table td { padding: 7px 10px; border-bottom: 1px solid #f0f2f6; vertical-align: middle; }
+  .data-table tr:hover td { background: #f8f9fe; }
+  .tag { display: inline-block; font-size: 10px; padding: 2px 7px; border-radius: 10px; font-weight: 600; }
+  .tag-rising { background: #e8f5e9; color: #2e7d32; }
+  .tag-top { background: #e3f2fd; color: #1565c0; }
+  .tag-naver { background: #e8f5e9; color: #1a7f4e; }
+  .tag-none { background: #f5f5f5; color: #999; }
+  .tag-seasonal { background: #fff3e0; color: #e65100; }
+  .drill-btn { font-size: 10px; padding: 2px 8px; background: #f0f4ff; border: 1px solid #c0cfe8; border-radius: 4px; cursor: pointer; color: #1a4fa0; }
+  .drill-btn:hover { background: #dce6ff; }
+
+  /* Naver chart */
+  .naver-bar { background: linear-gradient(90deg, #c62828, #ef5350); }
+  .rank-num { color: #aaa; font-size: 11px; width: 24px; text-align: right; }
+
+  /* Deep Dive */
+  .watchlist-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .watchlist-chip { display: flex; align-items: center; gap: 4px; background: white; border: 1px solid #d0d5e8; border-radius: 20px; padding: 4px 12px; font-size: 12px; cursor: pointer; }
+  .watchlist-chip.active { background: #1a4fa0; color: white; border-color: #1a4fa0; }
+  .star { color: #f0a500; }
+  .holiday-legend { display: flex; gap: 16px; font-size: 11px; margin-bottom: 8px; }
+  .hol-dot { display: inline-block; width: 12px; height: 2px; margin-right: 4px; vertical-align: middle; }
+
+  /* SVG chart */
+  .svg-chart-wrap { background: white; border-radius: 10px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.07); margin-bottom: 12px; }
+
+  /* Run history badges */
+  .src-ok { background: #e8f5e9; color: #2e7d32; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+  .src-err { background: #ffebee; color: #c62828; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+  .src-skip { background: #f5f5f5; color: #999; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+  .retry-btn { font-size: 10px; padding: 2px 8px; background: #fff3e0; border: 1px solid #ffcc80; border-radius: 4px; cursor: pointer; color: #e65100; }
+
+  /* Weekly digest */
+  .digest-list { list-style: none; }
+  .digest-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f2f6; }
+  .digest-icon { font-size: 18px; margin-right: 8px; }
+  .digest-name { font-size: 13px; font-weight: 500; }
+  .digest-meta { font-size: 11px; color: #999; margin-top: 2px; }
+  .dl-btn { font-size: 11px; padding: 3px 10px; background: #f0f4ff; border: 1px solid #c0cfe8; border-radius: 4px; cursor: pointer; color: #1a4fa0; }
+
+  /* Integrated signals banner */
+  .info-banner { background: #e8f0fe; border-left: 4px solid #1a4fa0; border-radius: 0 8px 8px 0; padding: 10px 14px; margin-bottom: 14px; font-size: 12px; color: #1a3a7a; }
+
+  /* Stats cards for deep dive */
+  .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+  .stat-card { background: white; border-radius: 8px; padding: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.06); text-align: center; }
+  .stat-val { font-size: 20px; font-weight: 700; }
+  .stat-lbl { font-size: 10px; color: #778; margin-top: 2px; }
+
+  /* Config warn */
+  .config-warn { background: #fff8e1; border: 1px solid #ffe082; border-radius: 6px; padding: 6px 12px; font-size: 11px; color: #7a5a00; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- Header -->
+<div class="header">
+  <div class="header-left">
+    <h1>🍏 식품 트렌드 자동화 대시보드</h1>
+    <div class="sub">food-trend-automation · Naver × Google Trends Integration</div>
+  </div>
+  <div class="header-right">
+    <span class="badge-ok">✅ 최신: 2026-06-08 06:15 &nbsp; naver ✓ &nbsp; google ✓</span>
+    <div class="toggle-live">
+      <span>Live</span>
+      <div class="toggle-dot"></div>
+    </div>
+    <button class="btn-sm">🔄 새로고침</button>
+  </div>
+</div>
+
+<div class="body">
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="sb-section">
+    <div class="sb-label">📅 날짜 범위</div>
+    <div class="date-presets">
+      <button class="date-btn">오늘</button>
+      <button class="date-btn active">7일</button>
+      <button class="date-btn">30일</button>
+      <button class="date-btn">90일</button>
+    </div>
+  </div>
+  <div class="sb-section">
+    <div class="sb-label">🔍 키워드 검색</div>
+    <input class="sb-input" type="text" placeholder="예: 영양제, 닭가슴살...">
+  </div>
+  <div class="sb-section">
+    <div class="sb-label">📂 카테고리</div>
+    <select class="sb-select" size="5" multiple>
+      <option selected>건강_영양제_비타민</option>
+      <option selected>콘텐츠_먹방_미디어</option>
+      <option>다이어트_체중관리</option>
+      <option>닭가슴살_단백질</option>
+      <option>오메가3_혈관건강</option>
+      <option>장건강_프로바이오틱스</option>
+      <option>제철과일_신선식품</option>
+      <option>간식_디저트</option>
+    </select>
+    <div style="font-size:10px;color:#99a;margin-top:3px">Ctrl+클릭으로 다중 선택</div>
+  </div>
+  <div class="sb-section">
+    <div class="sb-label">📈 트렌드 유형</div>
+    <select class="sb-select">
+      <option>전체</option>
+      <option>rising (급상승)</option>
+      <option>top (상위권)</option>
+    </select>
+  </div>
+  <div class="sb-section">
+    <div class="sb-label">🛒 Naver 상업 신호</div>
+    <div class="toggle-row">
+      <span>Naver 매칭만 보기</span>
+      <div class="mini-toggle off" id="naverToggle" onclick="this.classList.toggle('off')"></div>
+    </div>
+  </div>
+  <div class="sb-section">
+    <div class="sb-label">⚡ 최소 트렌드 값</div>
+    <div class="slider-val">50</div>
+    <input type="range" min="0" max="100" value="50" oninput="this.previousElementSibling.textContent=this.value">
+  </div>
+  <button class="btn-apply">✅ 필터 적용</button>
+  <button class="btn-reset">↺ 초기화</button>
+</div>
+
+<!-- Main -->
+<div class="main">
+
+  <!-- Nav -->
+  <div class="nav-bar">
+    <button class="nav-btn active" onclick="switchView('daily', this)">📊 Daily Overview</button>
+    <button class="nav-btn" onclick="switchView('google', this)">📈 Google Rising</button>
+    <button class="nav-btn" onclick="switchView('naver', this)">🛒 Naver Rankings</button>
+    <button class="nav-btn" onclick="switchView('integrated', this)">🔗 통합 상업 신호</button>
+    <button class="nav-btn" onclick="switchView('deepdive', this)">🔬 Keyword Deep Dive</button>
+    <button class="nav-btn" onclick="switchView('reports', this)">📋 Reports & Exports</button>
+  </div>
+
+  <!-- ===== VIEW: Daily Overview ===== -->
+  <div id="view-daily" class="view active">
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-label">오늘 수집 신호</div>
+        <div class="kpi-val">87</div>
+        <div class="kpi-sub">Google Rising 기준</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Naver 매칭 신호</div>
+        <div class="kpi-val" style="color:#1a7f4e">34 <span style="font-size:14px">39%</span></div>
+        <div class="kpi-sub kpi-up">▲ +5% vs 7일 평균</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">평균 트렌드 값</div>
+        <div class="kpi-val">112</div>
+        <div class="kpi-sub kpi-up">▲ +8 vs 전일</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Top 급상승 키워드</div>
+        <div class="kpi-val" style="font-size:16px">영양제</div>
+        <div class="kpi-sub">velocity +42% 🔥</div>
+      </div>
+    </div>
+
+    <div class="chart-grid">
+      <div class="card">
+        <div class="card-title">오늘의 Top 급상승 신호 (Google Rising)</div>
+        <div class="bar-chart">
+          <div class="bar-row">
+            <div class="bar-label">당뇨 영양제</div>
+            <div class="bar-wrap"><div class="bar-fill naver" style="width:93%"><span class="bar-val">140</span></div></div>
+            <span class="badge badge-v">+38%</span>
+            <span class="badge badge-c">3cat</span>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label">눈 건강 영양제</div>
+            <div class="bar-wrap"><div class="bar-fill naver" style="width:87%"><span class="bar-val">130</span></div></div>
+            <span class="badge badge-v">+25%</span>
+            <span class="badge badge-c">2cat</span>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label">마그네슘 효능</div>
+            <div class="bar-wrap"><div class="bar-fill non-naver" style="width:60%"><span class="bar-val">90</span></div></div>
+            <span class="badge badge-v">+12%</span>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label">콜라겐 영양제</div>
+            <div class="bar-wrap"><div class="bar-fill naver" style="width:47%"><span class="bar-val">70</span></div></div>
+            <span class="badge badge-v">+38%</span>
+            <span class="badge badge-c">2cat</span>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label">단백질 보충제</div>
+            <div class="bar-wrap"><div class="bar-fill naver" style="width:43%"><span class="bar-val">65</span></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label">저탄고지 식단</div>
+            <div class="bar-wrap"><div class="bar-fill non-naver" style="width:40%"><span class="bar-val">60</span></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label">루테인 눈영양제</div>
+            <div class="bar-wrap"><div class="bar-fill naver" style="width:37%"><span class="bar-val">55</span></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label">고단백 닭가슴살</div>
+            <div class="bar-wrap"><div class="bar-fill naver" style="width:33%"><span class="bar-val">50</span></div></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:10px;font-size:11px;color:#778">
+          <span><span style="display:inline-block;width:10px;height:10px;background:linear-gradient(90deg,#1a7f4e,#2ecc85);border-radius:2px;margin-right:3px"></span>Naver 매칭</span>
+          <span><span style="display:inline-block;width:10px;height:10px;background:#c0cfe8;border-radius:2px;margin-right:3px"></span>Google only</span>
+          <span style="color:#e65100">⚡velocity</span>
+          <span style="color:#1a4fa0">📦 multi-cat</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">카테고리 분포</div>
+        <div class="pie-wrap">
+          <svg width="130" height="130" viewBox="0 0 130 130">
+            <circle cx="65" cy="65" r="50" fill="none" stroke="#e8f0fe" stroke-width="28"/>
+            <circle cx="65" cy="65" r="50" fill="none" stroke="#1a4fa0" stroke-width="28" stroke-dasharray="94 220" stroke-dashoffset="0"/>
+            <circle cx="65" cy="65" r="50" fill="none" stroke="#2ecc85" stroke-width="28" stroke-dasharray="66 220" stroke-dashoffset="-94"/>
+            <circle cx="65" cy="65" r="50" fill="none" stroke="#f0a500" stroke-width="28" stroke-dasharray="44 220" stroke-dashoffset="-160"/>
+            <circle cx="65" cy="65" r="50" fill="none" stroke="#e05c5c" stroke-width="28" stroke-dasharray="16 220" stroke-dashoffset="-204"/>
+            <text x="65" y="68" text-anchor="middle" font-size="11" fill="#334" font-weight="600">87건</text>
+          </svg>
+          <div class="pie-legend">
+            <div class="pie-item"><div class="pie-dot" style="background:#1a4fa0"></div><span>건강_영양제_비타민 43%</span></div>
+            <div class="pie-item"><div class="pie-dot" style="background:#2ecc85"></div><span>다이어트_체중관리 30%</span></div>
+            <div class="pie-item"><div class="pie-dot" style="background:#f0a500"></div><span>닭가슴살_단백질 20%</span></div>
+            <div class="pie-item"><div class="pie-dot" style="background:#e05c5c"></div><span>기타 7%</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">신호 데이터 테이블</div>
+      <table class="data-table">
+        <tr><th>#</th><th>query</th><th>value</th><th>source_kw</th><th>trend_type</th><th>category</th><th>naver</th><th>naver_rank</th><th>velocity</th><th>cat_cnt</th><th></th></tr>
+        <tr>
+          <td>1</td><td><b>당뇨 영양제</b></td><td>140</td><td>영양제</td>
+          <td><span class="tag tag-rising">rising</span></td>
+          <td>건강_영양제</td>
+          <td><span class="tag tag-naver">✓ Naver</span></td>
+          <td>23</td><td style="color:#e65100">⚡ +38%</td><td>3</td>
+          <td><button class="drill-btn" onclick="switchView('deepdive',null,'당뇨 영양제')">🔬</button></td>
+        </tr>
+        <tr>
+          <td>2</td><td><b>눈 건강 영양제</b></td><td>130</td><td>눈건강</td>
+          <td><span class="tag tag-rising">rising</span></td>
+          <td>건강_영양제</td>
+          <td><span class="tag tag-naver">✓ Naver</span></td>
+          <td>41</td><td style="color:#e65100">⚡ +25%</td><td>2</td>
+          <td><button class="drill-btn" onclick="switchView('deepdive',null,'눈 건강 영양제')">🔬</button></td>
+        </tr>
+        <tr>
+          <td>3</td><td>마그네슘 효능</td><td>90</td><td>마그네슘</td>
+          <td><span class="tag tag-rising">rising</span></td>
+          <td>건강_영양제</td>
+          <td><span class="tag tag-none">—</span></td>
+          <td>—</td><td>+12%</td><td>1</td>
+          <td><button class="drill-btn" onclick="switchView('deepdive',null,'마그네슘')">🔬</button></td>
+        </tr>
+        <tr>
+          <td>4</td><td><b>콜라겐 영양제</b></td><td>70</td><td>콜라겐</td>
+          <td><span class="tag tag-rising">rising</span></td>
+          <td>건강_영양제</td>
+          <td><span class="tag tag-naver">✓ Naver</span></td>
+          <td>18</td><td style="color:#e65100">⚡ +38%</td><td>2</td>
+          <td><button class="drill-btn" onclick="switchView('deepdive',null,'콜라겐')">🔬</button></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== VIEW: Google Rising ===== -->
+  <div id="view-google" class="view">
+    <div class="chart-grid">
+      <div class="card">
+        <div class="card-title">Google Rising 신호 (카테고리별)</div>
+        <div class="bar-chart">
+          <div class="bar-row"><div class="bar-label">건강_영양제_비타민</div><div class="bar-wrap"><div class="bar-fill" style="width:90%;background:#1a4fa0"><span class="bar-val">38건</span></div></div></div>
+          <div class="bar-row"><div class="bar-label">다이어트_체중관리</div><div class="bar-wrap"><div class="bar-fill" style="width:62%;background:#3a7fd4"><span class="bar-val">26건</span></div></div></div>
+          <div class="bar-row"><div class="bar-label">닭가슴살_단백질</div><div class="bar-wrap"><div class="bar-fill" style="width:40%;background:#7ab0e8"><span class="bar-val">17건</span></div></div></div>
+          <div class="bar-row"><div class="bar-label">오메가3_혈관건강</div><div class="bar-wrap"><div class="bar-fill" style="width:24%;background:#aac8f0"><span class="bar-val">10건</span></div></div></div>
+          <div class="bar-row"><div class="bar-label">장건강_프로바이오틱</div><div class="bar-wrap"><div class="bar-fill" style="width:14%;background:#c8dff8"><span class="bar-val">6건</span></div></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">source_kw 분포</div>
+        <div style="margin-top:8px">
+          <div class="pie-item" style="margin-bottom:8px"><div class="pie-dot" style="background:#1a4fa0;width:14px;height:14px;border-radius:2px"></div><span>영양제 anchor (31%)</span></div>
+          <div class="pie-item" style="margin-bottom:8px"><div class="pie-dot" style="background:#2ecc85;width:14px;height:14px;border-radius:2px"></div><span>닭가슴살 anchor (22%)</span></div>
+          <div class="pie-item" style="margin-bottom:8px"><div class="pie-dot" style="background:#f0a500;width:14px;height:14px;border-radius:2px"></div><span>오메가3 anchor (18%)</span></div>
+          <div class="pie-item" style="margin-bottom:8px"><div class="pie-dot" style="background:#e05c5c;width:14px;height:14px;border-radius:2px"></div><span>콜라겐 anchor (15%)</span></div>
+          <div class="pie-item"><div class="pie-dot" style="background:#aaa;width:14px;height:14px;border-radius:2px"></div><span>기타 (14%)</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Google Rising 전체 테이블</div>
+      <table class="data-table">
+        <tr><th>#</th><th>query</th><th>value</th><th>trend_type</th><th>source_kw</th><th>category</th><th>date</th></tr>
+        <tr><td>1</td><td>당뇨 영양제</td><td>140</td><td><span class="tag tag-rising">rising</span></td><td>영양제</td><td>건강_영양제_비타민</td><td>2026-06-08</td></tr>
+        <tr><td>2</td><td>눈 건강 영양제</td><td>130</td><td><span class="tag tag-rising">rising</span></td><td>눈건강</td><td>건강_영양제_비타민</td><td>2026-06-08</td></tr>
+        <tr><td>3</td><td>마그네슘 효능</td><td>90</td><td><span class="tag tag-rising">rising</span></td><td>마그네슘</td><td>건강_영양제_비타민</td><td>2026-06-08</td></tr>
+        <tr><td>4</td><td>콜라겐 영양제</td><td>70</td><td><span class="tag tag-rising">rising</span></td><td>콜라겐</td><td>건강_영양제_비타민</td><td>2026-06-08</td></tr>
+        <tr><td>5</td><td>닭가슴살 100g 칼로리</td><td>65</td><td><span class="tag tag-top">top</span></td><td>닭가슴살</td><td>닭가슴살_단백질</td><td>2026-06-08</td></tr>
+        <tr><td>6</td><td>오메가3 추천</td><td>60</td><td><span class="tag tag-rising">rising</span></td><td>오메가3</td><td>오메가3_혈관건강</td><td>2026-06-08</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== VIEW: Naver Rankings ===== -->
+  <div id="view-naver" class="view">
+    <div class="chart-grid">
+      <div class="card">
+        <div class="card-title">Naver Shopping Insight Top 10 (2026-06-08)</div>
+        <div class="bar-chart">
+          <div class="bar-row"><span class="rank-num">1</span><div class="bar-label">쌀 20kg</div><div class="bar-wrap"><div class="bar-fill naver-bar" style="width:90%"><span class="bar-val">Top</span></div></div></div>
+          <div class="bar-row"><span class="rank-num">2</span><div class="bar-label">닭가슴살</div><div class="bar-wrap"><div class="bar-fill naver-bar" style="width:82%"></div></div><span class="badge badge-v">Google ✓</span></div>
+          <div class="bar-row"><span class="rank-num">3</span><div class="bar-label">계란 30구</div><div class="bar-wrap"><div class="bar-fill naver-bar" style="width:74%"></div></div></div>
+          <div class="bar-row"><span class="rank-num">4</span><div class="bar-label">어버이날선물</div><div class="bar-wrap"><div class="bar-fill" style="width:66%;background:#f0a500"></div></div><span class="badge tag-seasonal">🌸 계절</span></div>
+          <div class="bar-row"><span class="rank-num">5</span><div class="bar-label">오메가3</div><div class="bar-wrap"><div class="bar-fill naver-bar" style="width:58%"></div></div><span class="badge badge-v">Google ✓</span></div>
+          <div class="bar-row"><span class="rank-num">6</span><div class="bar-label">단백질 파우더</div><div class="bar-wrap"><div class="bar-fill naver-bar" style="width:50%"></div></div></div>
+          <div class="bar-row"><span class="rank-num">7</span><div class="bar-label">프로틴 바</div><div class="bar-wrap"><div class="bar-fill naver-bar" style="width:44%"></div></div></div>
+          <div class="bar-row"><span class="rank-num">8</span><div class="bar-label">마그네슘</div><div class="bar-wrap"><div class="bar-fill naver-bar" style="width:38%"></div></div><span class="badge badge-v">Google ✓</span></div>
+          <div class="bar-row"><span class="rank-num">9</span><div class="bar-label">유청단백질</div><div class="bar-wrap"><div class="bar-fill naver-bar" style="width:32%"></div></div></div>
+          <div class="bar-row"><span class="rank-num">10</span><div class="bar-label">스테비아 토마토</div><div class="bar-wrap"><div class="bar-fill naver-bar" style="width:26%"></div></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">키워드 7일 트렌드</div>
+        <svg width="100%" height="180" viewBox="0 0 300 180">
+          <line x1="40" y1="10" x2="40" y2="155" stroke="#ddd" stroke-width="1"/>
+          <line x1="40" y1="155" x2="290" y2="155" stroke="#ddd" stroke-width="1"/>
+          <text x="5" y="160" font-size="9" fill="#999">6/2</text>
+          <text x="245" y="160" font-size="9" fill="#999">6/8</text>
+          <!-- 닭가슴살 line -->
+          <polyline points="40,80 80,70 120,75 160,60 200,55 240,50 280,45" fill="none" stroke="#1a4fa0" stroke-width="2"/>
+          <!-- 오메가3 line -->
+          <polyline points="40,110 80,105 120,108 160,100 200,95 240,92 280,88" fill="none" stroke="#2ecc85" stroke-width="2"/>
+          <circle cx="280" cy="45" r="3" fill="#1a4fa0"/>
+          <circle cx="280" cy="88" r="3" fill="#2ecc85"/>
+          <text x="283" y="48" font-size="9" fill="#1a4fa0">닭가슴살</text>
+          <text x="283" y="91" font-size="9" fill="#2ecc85">오메가3</text>
+        </svg>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Naver 순위 전체 테이블 (Top 20)</div>
+      <table class="data-table">
+        <tr><th>rank</th><th>keyword</th><th>date</th><th>Google 매칭</th><th>velocity</th></tr>
+        <tr><td>1</td><td>쌀 20kg</td><td>2026-06-08</td><td><span class="tag tag-none">—</span></td><td>—</td></tr>
+        <tr><td>2</td><td>닭가슴살</td><td>2026-06-08</td><td><span class="tag tag-naver">Google Rising ✓</span></td><td>+15%</td></tr>
+        <tr><td>3</td><td>계란 30구</td><td>2026-06-08</td><td><span class="tag tag-none">—</span></td><td>—</td></tr>
+        <tr><td>4</td><td>어버이날선물</td><td>2026-06-08</td><td><span class="tag tag-seasonal">계절성</span></td><td>+82%</td></tr>
+        <tr><td>5</td><td>오메가3</td><td>2026-06-08</td><td><span class="tag tag-naver">Google Rising ✓</span></td><td>+8%</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== VIEW: Integrated ===== -->
+  <div id="view-integrated" class="view">
+    <div class="info-banner">
+      🔗 <b>통합 상업 신호</b>: Google Trends에서 급상승하면서 Naver Shopping에도 등장하는 키워드만 표시합니다.
+      Google 버즈 + 실제 구매 수요가 겹치는 신호 = 상업적 활용 가치가 높습니다.
+    </div>
+    <div class="kpi-row">
+      <div class="kpi-card"><div class="kpi-label">통합 신호 수</div><div class="kpi-val">34</div><div class="kpi-sub">전체 87건 중 39%</div></div>
+      <div class="kpi-card"><div class="kpi-label">평균 velocity</div><div class="kpi-val kpi-up">+28%</div><div class="kpi-sub">7일 롤링 평균 대비</div></div>
+      <div class="kpi-card"><div class="kpi-label">multi-cat (≥2)</div><div class="kpi-val">12</div><div class="kpi-sub">복수 카테고리 등장</div></div>
+      <div class="kpi-card"><div class="kpi-label">Top 신호</div><div class="kpi-val" style="font-size:14px">당뇨 영양제</div><div class="kpi-sub">v=140, vel +38%</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">통합 상업 신호 테이블</div>
+      <table class="data-table">
+        <tr><th>query</th><th>value</th><th>source_kw</th><th>trend_type</th><th>category</th><th>naver_rank</th><th>velocity</th><th>cat_cnt</th><th>date</th></tr>
+        <tr><td><b>당뇨 영양제</b></td><td>140</td><td>영양제</td><td><span class="tag tag-rising">rising</span></td><td>건강_영양제</td><td>23</td><td style="color:#e65100">⚡ +38%</td><td>3</td><td>2026-06-08</td></tr>
+        <tr><td><b>눈 건강 영양제</b></td><td>130</td><td>눈건강</td><td><span class="tag tag-rising">rising</span></td><td>건강_영양제</td><td>41</td><td style="color:#e65100">⚡ +25%</td><td>2</td><td>2026-06-08</td></tr>
+        <tr><td><b>콜라겐 영양제</b></td><td>70</td><td>콜라겐</td><td><span class="tag tag-rising">rising</span></td><td>건강_영양제</td><td>18</td><td style="color:#e65100">⚡ +38%</td><td>2</td><td>2026-06-08</td></tr>
+        <tr><td>닭가슴살</td><td>65</td><td>닭가슴살</td><td><span class="tag tag-top">top</span></td><td>닭가슴살_단백질</td><td>2</td><td>+15%</td><td>1</td><td>2026-06-08</td></tr>
+        <tr><td>오메가3</td><td>60</td><td>오메가3</td><td><span class="tag tag-rising">rising</span></td><td>오메가3_혈관건강</td><td>5</td><td>+8%</td><td>1</td><td>2026-06-08</td></tr>
+        <tr><td>마그네슘</td><td>55</td><td>마그네슘</td><td><span class="tag tag-rising">rising</span></td><td>건강_영양제</td><td>8</td><td>+12%</td><td>1</td><td>2026-06-08</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== VIEW: Deep Dive ===== -->
+  <div id="view-deepdive" class="view">
+    <div class="watchlist-row">
+      <span style="font-size:12px;color:#778;align-self:center;">⭐ 워치리스트:</span>
+      <div class="watchlist-chip active" id="chip-닭가슴살" onclick="selectChip(this)"><span class="star">★</span> 닭가슴살</div>
+      <div class="watchlist-chip" id="chip-영양제" onclick="selectChip(this)"><span class="star">★</span> 영양제</div>
+      <div class="watchlist-chip" id="chip-오메가3" onclick="selectChip(this)"><span class="star">★</span> 오메가3</div>
+      <div class="watchlist-chip" id="chip-콜라겐" onclick="selectChip(this)"><span class="star">★</span> 콜라겐</div>
+      <div class="watchlist-chip" style="border-style:dashed;color:#aaa" onclick="alert('워치리스트에 키워드 추가')">+ 추가</div>
+    </div>
+
+    <div class="config-warn">⚠️ 필터 변경됨 — 이전 데이터와 비교 주의 (min_value: 30 → 50, 2026-06-07 적용)</div>
+
+    <div class="svg-chart-wrap">
+      <div class="card-title">닭가슴살 — 7일 트렌드 (Google value + Naver rank)</div>
+      <div class="holiday-legend">
+        <span><span class="hol-dot" style="background:#ff69b4;display:inline-block"></span>어린이날 (5/5)</span>
+        <span><span class="hol-dot" style="background:#9b59b6;display:inline-block"></span>어버이날 (5/8)</span>
+        <span style="color:#e65100">⚡ velocity burst</span>
+      </div>
+      <svg width="100%" height="200" viewBox="0 0 600 200">
+        <!-- Grid -->
+        <line x1="50" y1="10" x2="50" y2="165" stroke="#eee" stroke-width="1"/>
+        <line x1="50" y1="165" x2="580" y2="165" stroke="#eee" stroke-width="1"/>
+        <!-- Y axis labels -->
+        <text x="5" y="20" font-size="9" fill="#aaa">100</text>
+        <text x="5" y="90" font-size="9" fill="#aaa">50</text>
+        <text x="5" y="165" font-size="9" fill="#aaa">0</text>
+        <!-- Holiday lines -->
+        <line x1="160" y1="10" x2="160" y2="165" stroke="#ff69b4" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <text x="162" y="22" font-size="9" fill="#ff69b4">어린이날</text>
+        <line x1="240" y1="10" x2="240" y2="165" stroke="#9b59b6" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <text x="242" y="22" font-size="9" fill="#9b59b6">어버이날</text>
+        <!-- Google value line -->
+        <polyline points="50,120 130,100 160,70 200,75 240,80 310,65 370,55 440,50 510,45 580,40" fill="none" stroke="#1a4fa0" stroke-width="2.5"/>
+        <!-- Velocity burst marker -->
+        <rect x="420" y="35" width="40" height="16" rx="8" fill="#fff3e0" stroke="#ffcc80"/>
+        <text x="440" y="47" text-anchor="middle" font-size="9" fill="#e65100">⚡+38%</text>
+        <!-- X axis dates -->
+        <text x="50" y="178" font-size="9" fill="#aaa" text-anchor="middle">6/2</text>
+        <text x="130" y="178" font-size="9" fill="#aaa" text-anchor="middle">6/3</text>
+        <text x="210" y="178" font-size="9" fill="#aaa" text-anchor="middle">6/4</text>
+        <text x="290" y="178" font-size="9" fill="#aaa" text-anchor="middle">6/5</text>
+        <text x="370" y="178" font-size="9" fill="#aaa" text-anchor="middle">6/6</text>
+        <text x="450" y="178" font-size="9" fill="#aaa" text-anchor="middle">6/7</text>
+        <text x="530" y="178" font-size="9" fill="#aaa" text-anchor="middle">6/8</text>
+        <!-- Legend -->
+        <line x1="55" y1="193" x2="75" y2="193" stroke="#1a4fa0" stroke-width="2"/>
+        <text x="78" y="196" font-size="9" fill="#1a4fa0">Google value</text>
+      </svg>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-val" style="color:#1a4fa0">65</div>
+        <div class="stat-lbl">오늘 Google value</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" style="color:#e65100">+15%</div>
+        <div class="stat-lbl">velocity (7d 대비)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" style="color:#1a7f4e">#2</div>
+        <div class="stat-lbl">Naver 오늘 순위</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">주요 이벤트 타임라인</div>
+      <table class="data-table">
+        <tr><th>날짜</th><th>이벤트</th><th>Google value</th><th>Naver rank</th><th>비고</th></tr>
+        <tr><td>2026-06-05</td><td>🔥 velocity burst</td><td>85</td><td>3</td><td style="color:#e65100">+38% surge</td></tr>
+        <tr><td>2026-06-08</td><td>📈 상승세 지속</td><td>65</td><td>2</td><td>multi-cat (1)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== VIEW: Reports ===== -->
+  <div id="view-reports" class="view">
+    <div class="chart-grid">
+      <div class="card">
+        <div class="card-title">📅 주간 다이제스트</div>
+        <ul class="digest-list">
+          <li class="digest-item">
+            <div style="display:flex;align-items:center">
+              <span class="digest-icon">📄</span>
+              <div>
+                <div class="digest-name">report_weekly_2026-W23.md</div>
+                <div class="digest-meta">2026-06-08 · 87 signals · naver_match 39% · top: 영양제</div>
+              </div>
+            </div>
+            <button class="dl-btn">⬇ 다운로드</button>
+          </li>
+          <li class="digest-item">
+            <div style="display:flex;align-items:center">
+              <span class="digest-icon">📄</span>
+              <div>
+                <div class="digest-name">report_weekly_2026-W22.md</div>
+                <div class="digest-meta">2026-06-01 · 74 signals · naver_match 35% · top: 닭가슴살</div>
+              </div>
+            </div>
+            <button class="dl-btn">⬇ 다운로드</button>
+          </li>
+          <li class="digest-item">
+            <div style="display:flex;align-items:center">
+              <span class="digest-icon">📄</span>
+              <div>
+                <div class="digest-name">report_weekly_2026-W21.md</div>
+                <div class="digest-meta">2026-05-25 · 68 signals · naver_match 31%</div>
+              </div>
+            </div>
+            <button class="dl-btn">⬇ 다운로드</button>
+          </li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title">📋 일일 리포트</div>
+        <ul class="digest-list">
+          <li class="digest-item">
+            <div style="display:flex;align-items:center">
+              <span class="digest-icon">✅</span>
+              <div>
+                <div class="digest-name">report_2026-06-08.csv</div>
+                <div class="digest-meta">87건 · naver+google 완료</div>
+              </div>
+            </div>
+            <button class="dl-btn">⬇</button>
+          </li>
+          <li class="digest-item">
+            <div style="display:flex;align-items:center">
+              <span class="digest-icon">✅</span>
+              <div>
+                <div class="digest-name">report_2026-06-07.csv</div>
+                <div class="digest-meta">82건 · 완료</div>
+              </div>
+            </div>
+            <button class="dl-btn">⬇</button>
+          </li>
+          <li class="digest-item">
+            <div style="display:flex;align-items:center">
+              <span class="digest-icon">❌</span>
+              <div>
+                <div class="digest-name">report_2026-06-05.csv</div>
+                <div class="digest-meta" style="color:#c62828">Google rate_limited · naver 완료</div>
+              </div>
+            </div>
+            <button class="retry-btn">↺ 재수집</button>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🏃 Run History</div>
+      <table class="data-table">
+        <tr><th>날짜</th><th>Naver</th><th>Google</th><th>Integration</th><th>rows</th><th>error_type</th><th>backfill</th><th>실행 시간</th></tr>
+        <tr>
+          <td>2026-06-08</td>
+          <td><span class="src-ok">ok</span></td><td><span class="src-ok">ok</span></td><td><span class="src-ok">ok</span></td>
+          <td>87</td><td>—</td><td>—</td><td>06:15</td>
+        </tr>
+        <tr>
+          <td>2026-06-07</td>
+          <td><span class="src-ok">ok</span></td><td><span class="src-ok">ok</span></td><td><span class="src-ok">ok</span></td>
+          <td>82</td><td>—</td><td>—</td><td>06:14</td>
+        </tr>
+        <tr>
+          <td>2026-06-06</td>
+          <td><span class="src-ok">ok</span></td><td><span class="src-ok">ok</span></td><td><span class="src-ok">ok</span></td>
+          <td>79</td><td>—</td><td>—</td><td>06:17</td>
+        </tr>
+        <tr>
+          <td>2026-06-05</td>
+          <td><span class="src-ok">ok</span></td>
+          <td><span class="src-err">err</span></td>
+          <td><span class="src-skip">skip</span></td>
+          <td>—</td><td style="color:#c62828">rate_limited</td><td>—</td><td>06:12</td>
+        </tr>
+        <tr>
+          <td>2026-06-04</td>
+          <td><span class="src-ok">ok</span></td><td><span class="src-ok">ok</span></td><td><span class="src-ok">ok</span></td>
+          <td>91</td><td>—</td><td><span class="badge tag-rising" style="font-size:10px">backfill</span></td><td>10:32</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /main -->
+</div><!-- /body -->
+</div><!-- /app -->
+
+<script>
+function switchView(viewId, btn, keyword) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + viewId).classList.add('active');
+  if (btn) btn.classList.add('active');
+  else {
+    // find and activate the right nav button
+    const navBtns = document.querySelectorAll('.nav-btn');
+    const map = {daily:0, google:1, naver:2, integrated:3, deepdive:4, reports:5};
+    if (map[viewId] !== undefined) navBtns[map[viewId]].classList.add('active');
+  }
+  if (keyword && viewId === 'deepdive') {
+    // select corresponding chip if exists
+    const chip = document.getElementById('chip-' + keyword);
+    if (chip) {
+      document.querySelectorAll('.watchlist-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+    }
+  }
+}
+
+function selectChip(el) {
+  document.querySelectorAll('.watchlist-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+</script>
+</body>
+</html>

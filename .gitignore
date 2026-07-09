@@ -1,0 +1,6 @@
+.env
+naver_browser_profile/
+brandconnect_link_tool/naver_browser_profile/
+__pycache__/
+*.pyc
+.DS_Store

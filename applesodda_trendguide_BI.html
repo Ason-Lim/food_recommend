@@ -1,0 +1,316 @@
+<h2 class="sr-only">trendguide by applesodda — 상큼하고 시원한 푸드 트렌드 브랜드 아이덴티티 키트</h2>
+
+<style>
+:root {
+  --ap-green: #3DA048;
+  --ap-aqua: #1BBDB5;
+  --ap-fizz: #B8E63C;
+  --ap-light: #F2FCF5;
+  --ap-mist: #E0F7F0;
+  --ap-deep: #1A3A22;
+  --ap-bubble: #D0F5EE;
+  --ap-lime: #DCF26A;
+  --ap-green-m: #2F7A38;
+  --ap-aqua-m: #148F89;
+}
+.bi-wrap { padding: 0.5rem 0 1rem; }
+.bi-lbl {
+  font-size: 11px; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--color-text-tertiary); margin-bottom: 12px;
+}
+.sec { margin-bottom: 2.5rem; }
+hr.div { border: none; border-top: 0.5px solid var(--color-border-tertiary); margin: 0 0 2rem; }
+
+/* LOGO */
+.logo-hero {
+  background: var(--ap-deep);
+  border-radius: var(--border-radius-lg);
+  padding: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 10px;
+  position: relative;
+  overflow: hidden;
+}
+.bubble-bg {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+}
+.logo-symbol {
+  width: 52px; height: 52px;
+  border-radius: 14px;
+  background: var(--ap-green);
+  display: flex; align-items: center; justify-content: center;
+  position: relative; z-index: 1;
+}
+.logo-text-group { position: relative; z-index: 1; }
+.logo-main {
+  font-size: 30px; font-weight: 500;
+  letter-spacing: -0.02em; line-height: 1;
+  font-family: var(--font-sans);
+}
+.logo-main span.t { color: var(--ap-fizz); }
+.logo-main span.g { color: white; }
+.logo-sub {
+  font-size: 11px; letter-spacing: 0.14em;
+  margin-top: 5px; text-transform: uppercase;
+  font-family: var(--font-sans);
+}
+.logo-light {
+  background: var(--ap-light);
+  border: 0.5px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-lg);
+  padding: 1.5rem;
+  display: flex; align-items: center;
+  justify-content: center; gap: 14px;
+}
+.logo-symbol-light {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: var(--ap-green);
+  display: flex; align-items: center; justify-content: center;
+}
+.logo-main-light {
+  font-size: 26px; font-weight: 500;
+  color: var(--ap-deep); letter-spacing: -0.02em;
+  line-height: 1; font-family: var(--font-sans);
+}
+.logo-main-light span { color: var(--ap-green); }
+.logo-sub-light {
+  font-size: 11px; color: var(--ap-aqua);
+  letter-spacing: 0.12em; margin-top: 4px; text-transform: uppercase;
+}
+.logo-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* COLORS */
+.color-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(88px, 1fr)); gap: 8px; }
+.swatch { border-radius: var(--border-radius-md); overflow: hidden; border: 0.5px solid var(--color-border-tertiary); }
+.swatch-block { height: 60px; }
+.swatch-info { padding: 7px 10px; background: var(--color-background-primary); }
+.swatch-name { font-size: 12px; font-weight: 500; color: var(--color-text-primary); display: block; }
+.swatch-hex { font-size: 10px; color: var(--color-text-tertiary); font-family: var(--font-mono); }
+
+/* TYPOGRAPHY */
+.type-box { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem 1.5rem; }
+.type-row { padding: 12px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.type-row:last-child { border-bottom: none; }
+.type-meta { font-size: 10px; color: var(--color-text-tertiary); margin-bottom: 3px; letter-spacing: 0.04em; }
+
+/* BADGE SYSTEM */
+.badge-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.bdg {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 12px; border-radius: 20px;
+  font-size: 12px; font-weight: 500;
+}
+.bdg-green { background: #DFFAE3; color: var(--ap-green-m); }
+.bdg-aqua { background: var(--ap-bubble); color: var(--ap-aqua-m); }
+.bdg-fizz { background: #EAF9A0; color: #4A7000; }
+.bdg-outline { background: transparent; border: 1.5px solid var(--ap-aqua); color: var(--ap-aqua-m); }
+
+/* CARD EXAMPLES */
+.card-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.ex-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; }
+.ex-card-top { height: 70px; display: flex; align-items: center; justify-content: center; position: relative; }
+.ex-card-body { padding: 12px 14px; }
+.ex-card-cat { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+.ex-card-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); line-height: 1.4; margin: 0 0 4px; }
+.ex-card-meta { font-size: 11px; color: var(--color-text-tertiary); }
+
+/* VOICE */
+.voice-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
+.voice-card { border-radius: var(--border-radius-md); padding: 14px; }
+.voice-w { font-size: 15px; font-weight: 500; margin-bottom: 4px; color: var(--color-text-primary); }
+.voice-d { font-size: 12px; color: var(--color-text-secondary); line-height: 1.5; }
+</style>
+
+<div class="bi-wrap">
+
+  <div class="sec">
+    <p class="bi-lbl">로고 시스템</p>
+    <div class="logo-hero">
+      <div class="bubble-bg" style="width:120px;height:120px;top:-40px;right:60px;"></div>
+      <div class="bubble-bg" style="width:60px;height:60px;bottom:10px;left:80px;"></div>
+      <div class="bubble-bg" style="width:30px;height:30px;top:20px;left:200px;"></div>
+      <div class="logo-symbol">
+        <svg width="30" height="32" viewBox="0 0 30 32" fill="none">
+          <path d="M15 1C15 1 8 7 8 13.5C8 17.5 11 21 15 21C19 21 22 17.5 22 13.5C22 7 15 1 15 1Z" fill="white" opacity="0.95"/>
+          <path d="M15 1C15 1 15 4 17.5 5.5" stroke="#B8E63C" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="22" cy="8" r="2" fill="#B8E63C" opacity="0.8"/>
+          <circle cx="25" cy="14" r="1.2" fill="white" opacity="0.4"/>
+          <path d="M10 24H20" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="logo-text-group">
+        <div class="logo-main"><span class="t">trend</span><span class="g">guide</span></div>
+        <div class="logo-sub" style="color: rgba(184,230,60,0.7);">by applesodda · food trend curator</div>
+      </div>
+    </div>
+
+    <div class="logo-pair">
+      <div class="logo-light">
+        <div class="logo-symbol-light">
+          <svg width="26" height="28" viewBox="0 0 30 32" fill="none">
+            <path d="M15 1C15 1 8 7 8 13.5C8 17.5 11 21 15 21C19 21 22 17.5 22 13.5C22 7 15 1 15 1Z" fill="white" opacity="0.95"/>
+            <path d="M15 1C15 1 15 4 17.5 5.5" stroke="#B8E63C" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="22" cy="8" r="2" fill="#B8E63C"/>
+            <path d="M10 24H20" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <div class="logo-main-light"><span>trend</span>guide</div>
+          <div class="logo-sub-light">by applesodda</div>
+        </div>
+      </div>
+      <div class="logo-light" style="background: var(--ap-deep); border-color: transparent;">
+        <div class="logo-symbol-light" style="background: var(--ap-aqua);">
+          <svg width="26" height="28" viewBox="0 0 30 32" fill="none">
+            <path d="M15 1C15 1 8 7 8 13.5C8 17.5 11 21 15 21C19 21 22 17.5 22 13.5C22 7 15 1 15 1Z" fill="white" opacity="0.95"/>
+            <path d="M15 1C15 1 15 4 17.5 5.5" stroke="#1A3A22" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="22" cy="8" r="2" fill="#1A3A22"/>
+            <path d="M10 24H20" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <div style="font-size:24px; font-weight:500; color: var(--ap-aqua); letter-spacing:-0.02em; line-height:1; font-family:var(--font-sans);">trend<span style="color:white;">guide</span></div>
+          <div style="font-size:11px; color:rgba(27,189,181,0.6); letter-spacing:0.12em; margin-top:4px; text-transform:uppercase; font-family:var(--font-sans);">by applesodda</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="div">
+
+  <div class="sec">
+    <p class="bi-lbl">브랜드 컬러 — apple + sodda</p>
+    <div class="color-grid">
+      <div class="swatch">
+        <div class="swatch-block" style="background:#3DA048;"></div>
+        <div class="swatch-info"><span class="swatch-name">Apple</span><span class="swatch-hex">#3DA048</span></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-block" style="background:#1BBDB5;"></div>
+        <div class="swatch-info"><span class="swatch-name">Soda</span><span class="swatch-hex">#1BBDB5</span></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-block" style="background:#B8E63C;"></div>
+        <div class="swatch-info"><span class="swatch-name">Fizz</span><span class="swatch-hex">#B8E63C</span></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-block" style="background:#D0F5EE;"></div>
+        <div class="swatch-info"><span class="swatch-name">Bubble</span><span class="swatch-hex">#D0F5EE</span></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-block" style="background:#F2FCF5;"></div>
+        <div class="swatch-info"><span class="swatch-name">Mist</span><span class="swatch-hex">#F2FCF5</span></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-block" style="background:#1A3A22;"></div>
+        <div class="swatch-info"><span class="swatch-name">Deep Leaf</span><span class="swatch-hex">#1A3A22</span></div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="div">
+
+  <div class="sec">
+    <p class="bi-lbl">타이포그래피</p>
+    <div class="type-box">
+      <div class="type-row">
+        <p class="type-meta">헤드라인 — 24px / 500</p>
+        <p style="font-size:24px; font-weight:500; color: var(--ap-deep); margin:0; line-height:1.3;">올여름 탄산음료 트렌드 총정리</p>
+      </div>
+      <div class="type-row">
+        <p class="type-meta">서브헤드 — 18px / 500</p>
+        <p style="font-size:18px; font-weight:500; color: var(--ap-green); margin:0; line-height:1.4;">상큼함이 터지는 新 푸드 키워드</p>
+      </div>
+      <div class="type-row">
+        <p class="type-meta">본문 — 15px / 400</p>
+        <p style="font-size:15px; color: var(--color-text-secondary); margin:0; line-height:1.75;">사과처럼 아삭하고 탄산처럼 톡 쏘는 시각으로 — 매주 새로운 식문화 트렌드를 큐레이션합니다.</p>
+      </div>
+      <div class="type-row">
+        <p class="type-meta">태그/메타 — 12px / 400</p>
+        <p style="font-size:12px; color: var(--ap-aqua); margin:0; letter-spacing:0.04em;">applesodda · trendguide · 2025.06</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="div">
+
+  <div class="sec">
+    <p class="bi-lbl">배지 & 태그 시스템</p>
+    <div class="badge-row">
+      <span class="bdg bdg-green">🍏 트렌드 리포트</span>
+      <span class="bdg bdg-aqua">💧 식재료 가이드</span>
+      <span class="bdg bdg-fizz">✨ 맛집 큐레이션</span>
+      <span class="bdg bdg-outline">홈쿡 레시피</span>
+      <span class="bdg" style="background:var(--ap-deep);color:var(--ap-fizz);">주간 픽</span>
+    </div>
+  </div>
+
+  <hr class="div">
+
+  <div class="sec">
+    <p class="bi-lbl">카드 스타일</p>
+    <div class="card-row">
+      <div class="ex-card">
+        <div class="ex-card-top" style="background: linear-gradient(135deg, #DFFAE3, #D0F5EE);">
+          <svg width="50" height="50" viewBox="0 0 50 50" fill="none" style="opacity:0.5;">
+            <path d="M25 6C25 6 14 16 14 25C14 30.5 19 35 25 35C31 35 36 30.5 36 25C36 16 25 6 25 6Z" fill="#3DA048"/>
+            <circle cx="36" cy="12" r="3.5" fill="#B8E63C"/>
+            <circle cx="40" cy="20" r="2" fill="#1BBDB5" opacity="0.7"/>
+            <path d="M18 39H32" stroke="#3DA048" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="ex-card-body">
+          <p class="ex-card-cat" style="color: var(--ap-green);">트렌드 리포트</p>
+          <p class="ex-card-title">제로슈거 음료, 진짜 맛있어진 이유</p>
+          <p class="ex-card-meta">조회 3,241 · ♥ 418</p>
+        </div>
+      </div>
+      <div class="ex-card">
+        <div class="ex-card-top" style="background: linear-gradient(135deg, #D0F5EE, #E0F7F0);">
+          <svg width="50" height="50" viewBox="0 0 50 50" fill="none" style="opacity:0.45;">
+            <circle cx="25" cy="22" r="12" fill="#1BBDB5"/>
+            <circle cx="16" cy="15" r="3" fill="#B8E63C"/>
+            <circle cx="34" cy="15" r="2" fill="#B8E63C" opacity="0.7"/>
+            <circle cx="30" cy="30" r="4" fill="#3DA048" opacity="0.6"/>
+          </svg>
+        </div>
+        <div class="ex-card-body">
+          <p class="ex-card-cat" style="color: var(--ap-aqua);">식재료 가이드</p>
+          <p class="ex-card-title">6월 제철 재료로 만드는 상큼 한 끼</p>
+          <p class="ex-card-meta">조회 1,872 · ♥ 249</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="div">
+
+  <div class="sec">
+    <p class="bi-lbl">브랜드 퍼스널리티</p>
+    <div class="voice-grid">
+      <div class="voice-card" style="background:#DFFAE3;">
+        <p class="voice-w" style="color:#2F7A38;">상큼</p>
+        <p class="voice-d" style="color:#2F7A38;">사과처럼 아삭한 첫인상의 콘텐츠</p>
+      </div>
+      <div class="voice-card" style="background:var(--ap-bubble);">
+        <p class="voice-w" style="color:var(--ap-aqua-m);">톡톡</p>
+        <p class="voice-d" style="color:var(--ap-aqua-m);">탄산처럼 톡 쏘는 날카로운 인사이트</p>
+      </div>
+      <div class="voice-card" style="background:#EAF9A0;">
+        <p class="voice-w" style="color:#4A7000;">신선</p>
+        <p class="voice-d" style="color:#4A7000;">가장 빠른 트렌드, 가장 먼저 전달</p>
+      </div>
+      <div class="voice-card" style="background:#E0F7F0;">
+        <p class="voice-w" style="color:#148F89;">시원</p>
+        <p class="voice-d" style="color:#148F89;">읽고 나면 기분 좋아지는 청량함</p>
+      </div>
+    </div>
+  </div>
+
+</div>
