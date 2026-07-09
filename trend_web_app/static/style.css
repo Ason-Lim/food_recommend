@@ -71,9 +71,13 @@ button, input, select, textarea {
     margin-bottom: 40px;
 }
 
-.logo-emoji {
-    font-size: 32px;
-    filter: drop-shadow(0 4px 8px rgba(3, 199, 90, 0.3));
+.logo-img {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 .brand-text h2 {
