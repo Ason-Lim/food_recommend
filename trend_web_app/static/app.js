@@ -223,7 +223,7 @@ function renderTrendsTable(data) {
         const isAdded = selectedKeywords[item.keyword] !== undefined;
         
         const actionBtn = isAdded 
-            ? `<button class="btn btn-secondary btn-sm" onclick="removeKeyword('${item.keyword}')">제거됨</button>`
+            ? `<button class="btn btn-secondary btn-sm" onclick="removeKeyword('${item.keyword}')" title="클릭 시 선택 해제">✓ 선택됨</button>`
             : `<button class="btn btn-primary btn-sm" onclick="addKeyword('${item.keyword}', ${item.datalab_velocity})">선택</button>`;
             
         row.innerHTML = `
@@ -246,6 +246,15 @@ function renderTrendsTable(data) {
 function addKeyword(keyword, velocity) {
     if (!selectedKeywords[keyword]) {
         selectedKeywords[keyword] = { velocity, link: "" };
+        
+        // Auto-copy keyword to clipboard for easy search in Chrome extension
+        navigator.clipboard.writeText(keyword).then(() => {
+            showNotification(`"${keyword}" 키워드가 선택 및 복사되었습니다!`);
+        }).catch(err => {
+            console.error("Auto-copy failed", err);
+            showNotification(`"${keyword}" 키워드가 선택되었습니다.`);
+        });
+        
         renderMapperList();
         renderTrendsTable(trendData);
     }
@@ -706,4 +715,42 @@ function loadHistoryItem(index) {
     });
     
     alert(`"${item.title || "식품 트렌드"}" 과거 원고 초안을 불러왔습니다.`);
+}
+
+// 12. Toast Notification Helper
+function showNotification(message) {
+    const toast = document.createElement("div");
+    toast.style.position = "fixed";
+    toast.style.top = "20px";
+    toast.style.right = "20px";
+    toast.style.backgroundColor = "var(--primary-color)"; // Naver Green
+    toast.style.color = "white";
+    toast.style.padding = "12px 20px";
+    toast.style.borderRadius = "var(--border-radius-md)";
+    toast.style.boxShadow = "0 4px 12px rgba(3, 199, 90, 0.3)";
+    toast.style.zIndex = "9999";
+    toast.style.fontFamily = "'Noto Sans KR', sans-serif";
+    toast.style.fontSize = "13px";
+    toast.style.fontWeight = "600";
+    toast.style.opacity = "0";
+    toast.style.transition = "opacity 0.3s ease, transform 0.3s ease";
+    toast.style.transform = "translateY(-10px)";
+    toast.innerText = message;
+    
+    document.body.appendChild(toast);
+    
+    // Trigger animation
+    setTimeout(() => {
+        toast.style.opacity = "1";
+        toast.style.transform = "translateY(0)";
+    }, 50);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.transform = "translateY(-10px)";
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+    }, 3000);
 }
