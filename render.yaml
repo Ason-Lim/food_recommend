@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: food-recommend-web
+    env: docker
+    dockerfilePath: trend_web_app/Dockerfile
+    dockerContext: .
+    plan: free # Change to standard paid plans if higher resources are needed
+    envVars:
+      - key: NAVER_CLIENT_ID
+        sync: false # User will input this manually in the Render dashboard
+      - key: NAVER_CLIENT_SECRET
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
