@@ -205,14 +205,9 @@
                                     </ul>
                                 </div>
 
-                                 <div style="display: flex; gap: 8px; margin-top: 15px;">
-                                     <button class="btn btn-primary" id="btn-generate-blog" style="flex-grow: 1;" disabled>
-                                         🚀 AI 블로그 원고 작성
-                                     </button>
-                                     <button class="btn btn-secondary" id="btn-reset-editor" style="width: auto; padding: 0 15px;" title="입력 및 작성 내용 초기화">
-                                         🧹 초기화
-                                     </button>
-                                 </div>
+                                 <button class="btn btn-primary btn-block" id="btn-generate-blog" disabled>
+                                     🚀 AI 블로그 원고 작성
+                                 </button>
                                  <div class="loader-container" id="blog-loader">
                                      <div class="spinner"></div>
                                      <span>원고 초안 생성 중... (약 15~30초)</span>
@@ -265,13 +260,14 @@
 
                     <div class="composer-main">
                         <div class="card preview-card">
-                            <div class="card-header">
-                                <h3>✍️ 작성된 블로그 초안 원고</h3>
-                                 <div class="preview-actions">
-                                     <button class="btn btn-secondary btn-sm" id="btn-save-draft">💾 원고 저장</button>
-                                     <button class="btn btn-secondary btn-sm" id="btn-copy-markdown">마크다운 복사</button>
-                                     <button class="btn btn-secondary btn-sm" id="btn-copy-raw">전체 텍스트 복사</button>
-                                 </div>
+                            <div class="card-header" style="flex-direction: column; align-items: flex-start; gap: 14px; padding-bottom: 14px;">
+                                <h3 style="margin: 0;">✍️ 작성된 블로그 초안 원고</h3>
+                                <div class="preview-actions" style="display: flex; gap: 10px; width: 100%; margin-top: 5px;">
+                                    <button class="btn btn-secondary btn-sm" id="btn-copy-markdown">마크다운 복사</button>
+                                    <button class="btn btn-secondary btn-sm" id="btn-copy-raw">전체 텍스트 복사</button>
+                                    <button class="btn btn-secondary btn-sm" id="btn-save-draft">💾 원고 저장</button>
+                                    <button class="btn btn-secondary btn-sm" id="btn-reset-editor">🧹 초기화</button>
+                                </div>
                             </div>
                             <div class="markdown-preview-container" id="markdown-preview">
                                 <div class="preview-placeholder">
