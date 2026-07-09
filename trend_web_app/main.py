@@ -16,13 +16,8 @@ from psycopg2.extras import RealDictCursor
 
 # Resolve paths
 CURRENT_DIR = Path(__file__).resolve().parent
-
-if (CURRENT_DIR / "daily_food_data").exists():
-    PROJECT_ROOT = CURRENT_DIR
-    DATA_DIR = CURRENT_DIR / "daily_food_data"
-else:
-    PROJECT_ROOT = CURRENT_DIR.parent
-    DATA_DIR = PROJECT_ROOT / "daily_food_data"
+PROJECT_ROOT = CURRENT_DIR.parent
+DATA_DIR = CURRENT_DIR / "daily_food_data"
 
 # Load environment variables
 load_dotenv(dotenv_path=PROJECT_ROOT / ".env")
@@ -64,7 +59,6 @@ def init_db():
         conn.close()
 
 # Import Naver DataLab Client
-sys.path.insert(0, str(PROJECT_ROOT))
 try:
     from naver_datalab_client import shopping_category_keyword_trend, NaverDataLabError
 except ImportError as e:

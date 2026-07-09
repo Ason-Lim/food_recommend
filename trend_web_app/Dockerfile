@@ -14,11 +14,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY trend_web_app/main.py .
 COPY trend_web_app/static/ ./static/
 
-# Copy dependencies from root level needed by the app
-# Note: When building, build from the root directory context:
-# docker build -t food-trend-web -f trend_web_app/Dockerfile .
-COPY naver_datalab_client.py .
-COPY daily_food_data/ ./daily_food_data/
+COPY trend_web_app/naver_datalab_client.py .
+COPY trend_web_app/daily_food_data/ ./daily_food_data/
+
 
 # Expose port 8000 for the FastAPI server
 EXPOSE 8000
