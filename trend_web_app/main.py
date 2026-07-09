@@ -483,6 +483,33 @@ def get_blog_history():
     finally:
         conn.close()
 
+@app.get("/api/debug-paths")
+def debug_paths():
+    import os
+    from pathlib import Path
+    
+    current_dir = Path(__file__).resolve().parent
+    cwd = os.getcwd()
+    
+    app_files = os.listdir("/app") if os.path.exists("/app") else []
+    root_files = os.listdir("/") if os.path.exists("/") else []
+    
+    daily_food_data_in_app = os.listdir("/app/daily_food_data") if os.path.exists("/app/daily_food_data") else None
+    daily_food_data_in_root = os.listdir("/daily_food_data") if os.path.exists("/daily_food_data") else None
+    
+    return {
+        "__file__": __file__,
+        "CURRENT_DIR": str(current_dir),
+        "cwd": cwd,
+        "PROJECT_ROOT": str(PROJECT_ROOT),
+        "DATA_DIR": str(DATA_DIR),
+        "DATA_DIR_exists": DATA_DIR.exists(),
+        "app_files": app_files,
+        "root_files": root_files,
+        "daily_food_data_in_app": daily_food_data_in_app,
+        "daily_food_data_in_root": daily_food_data_in_root,
+    }
+
 
 # Serve Static files (index.html, app.js, style.css)
 # Serve index.html on root '/'
