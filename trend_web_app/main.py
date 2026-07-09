@@ -16,8 +16,13 @@ from psycopg2.extras import RealDictCursor
 
 # Resolve paths
 CURRENT_DIR = Path(__file__).resolve().parent
-PROJECT_ROOT = CURRENT_DIR.parent
-DATA_DIR = PROJECT_ROOT / "daily_food_data"
+
+if (CURRENT_DIR / "daily_food_data").exists():
+    PROJECT_ROOT = CURRENT_DIR
+    DATA_DIR = CURRENT_DIR / "daily_food_data"
+else:
+    PROJECT_ROOT = CURRENT_DIR.parent
+    DATA_DIR = PROJECT_ROOT / "daily_food_data"
 
 # Load environment variables
 load_dotenv(dotenv_path=PROJECT_ROOT / ".env")
