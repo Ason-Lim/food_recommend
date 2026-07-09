@@ -99,6 +99,12 @@ class GenerateBlogRequest(BaseModel):
     model: Optional[str] = "claude-3-5-sonnet-20260229"
     custom_prompt: Optional[str] = None
 
+class SaveDraftRequest(BaseModel):
+    title: str
+    content: str
+    keywords: List[str] = []
+    links: Dict[str, str] = {}
+
 # Helper functions for calculations
 def load_daily_rankings() -> Dict[str, Dict[str, int]]:
     """Loads CSV files under daily_food_data and returns {date: {keyword: rank}}."""
@@ -478,6 +484,34 @@ def get_blog_history():
     except Exception as e:
         print(f"Failed to fetch blog history: {e}")
         return []
+    finally:
+        conn.close()
+
+@app.post("/api/history/save")
+def save_blog_draft(request: SaveDraftRequest):
+    """Manually saves the current blog draft to the PostgreSQL database."""
+    conn = get_db_connection()
+    if not conn:
+        raise HTTPException(status_code=500, detail="Database connection is not configured or offline.")
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                INSERT INTO blog_history (title, keywords_json, links_json, content)
+                VALUES (%s, %s, %s, %s)
+                """,
+                (
+                    request.title,
+                    json.dumps(request.keywords, ensure_ascii=False),
+                    json.dumps(request.links, ensure_ascii=False),
+                    request.content
+                )
+            )
+            conn.commit()
+            return {"status": "success", "message": "Draft saved successfully."}
+    except Exception as e:
+        print(f"Failed to manually save blog draft: {e}")
+        raise HTTPException(status_code=500, detail=f"Database save error: {str(e)}")
     finally:
         conn.close()
 

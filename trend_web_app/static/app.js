@@ -109,6 +109,12 @@ function initEventListeners() {
     // Generate Blog Draft
     document.getElementById("btn-generate-blog").addEventListener("click", generateBlogDraft);
     
+    // Reset Editor
+    document.getElementById("btn-reset-editor").addEventListener("click", resetEditor);
+    
+    // Save Draft manually
+    document.getElementById("btn-save-draft").addEventListener("click", saveCurrentDraft);
+    
     // Copy Buttons
     document.getElementById("btn-copy-markdown").addEventListener("click", () => copyToClipboard("markdown"));
     document.getElementById("btn-copy-raw").addEventListener("click", () => copyToClipboard("raw"));
@@ -755,4 +761,74 @@ function showNotification(message) {
             toast.remove();
         }, 300);
     }, 3000);
+}
+
+// 13. Reset Editor & inputs (New Post)
+function resetEditor() {
+    selectedKeywords = {};
+    document.getElementById("blog-title-input").value = "";
+    document.getElementById("blog-custom-prompt").value = "";
+    
+    renderTrendsTable(trendData);
+    renderMapperList();
+    
+    // Clear preview
+    const previewContainer = document.getElementById("markdown-preview");
+    previewContainer.innerHTML = `
+        <div class="preview-placeholder">
+            <span class="placeholder-icon">📝</span>
+            <p>입력 양식을 채우고 "AI 블로그 원고 작성"을 클릭하면 여기에 원고가 생성됩니다.</p>
+        </div>
+    `;
+    window.generatedPostMarkdown = "";
+    
+    // Reset compliance checklists
+    document.getElementById("chk-disclosure").className = "check-item pending";
+    document.getElementById("chk-disclosure").querySelector(".check-icon").textContent = "❔";
+    document.getElementById("chk-advertising").className = "check-item pending";
+    document.getElementById("chk-advertising").querySelector(".check-icon").textContent = "⚠️";
+    document.getElementById("chk-duration").className = "check-item pending";
+    document.getElementById("chk-duration").querySelector(".check-icon").textContent = "⚠️";
+    
+    showNotification("입력 양식 및 원고 에디터가 초기화되었습니다.");
+}
+
+// 14. Manual save draft to PostgreSQL DB
+async function saveCurrentDraft() {
+    const markdownText = window.generatedPostMarkdown;
+    if (!markdownText) {
+        showNotification("저장할 원고 내용이 없습니다. 먼저 원고를 작성해 주세요.");
+        return;
+    }
+    
+    const titleHint = document.getElementById("blog-title-input").value.trim() || "식품 트렌드 추천 리포트";
+    const keywords = Object.keys(selectedKeywords);
+    const links = {};
+    keywords.forEach(kw => {
+        links[kw] = selectedKeywords[kw].link;
+    });
+    
+    try {
+        const response = await fetch("/api/history/save", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                title: titleHint,
+                content: markdownText,
+                keywords: keywords,
+                links: links
+            })
+        });
+        
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.detail || "원고 저장 실패");
+        }
+        
+        showNotification("원고 초안이 데이터베이스에 안전하게 저장되었습니다!");
+        loadBlogHistory(); // Reload history panel
+    } catch (e) {
+        console.error(e);
+        alert("원고 저장 실패: 데이터베이스가 비활성화 상태이거나 연결 설정이 되어 있지 않습니다. Render 환경변수에 DATABASE_URL이 정상 등록되었는지 확인해 주세요.");
+    }
 }
