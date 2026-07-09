@@ -50,6 +50,13 @@ def init_db():
                     links_json TEXT,
                     content TEXT
                 );
+                CREATE TABLE IF NOT EXISTS daily_keyword_rankings (
+                    id SERIAL PRIMARY KEY,
+                    date DATE NOT NULL,
+                    rank INT NOT NULL,
+                    keyword VARCHAR(255) NOT NULL,
+                    UNIQUE(date, rank)
+                );
             """)
             conn.commit()
             print("PostgreSQL database tables initialized successfully.")
@@ -96,7 +103,7 @@ class KeywordLinkMap(BaseModel):
 class GenerateBlogRequest(BaseModel):
     title_hint: Optional[str] = None
     keywords_with_links: List[KeywordLinkMap]
-    model: Optional[str] = "claude-3-5-sonnet-20260229"
+    model: Optional[str] = "claude-sonnet-5"
     custom_prompt: Optional[str] = None
 
 class SaveDraftRequest(BaseModel):
@@ -107,8 +114,36 @@ class SaveDraftRequest(BaseModel):
 
 # Helper functions for calculations
 def load_daily_rankings() -> Dict[str, Dict[str, int]]:
-    """Loads CSV files under daily_food_data and returns {date: {keyword: rank}}."""
+    """Loads rankings from PostgreSQL database first, falls back to CSV files."""
     daily = {}
+    
+    # Try loading from database
+    conn = get_db_connection()
+    if conn:
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    SELECT date, rank, keyword 
+                    FROM daily_keyword_rankings 
+                    ORDER BY date, rank
+                """)
+                rows = cur.fetchall()
+                for r_date, r_rank, r_kw in rows:
+                    # Handle both datetime.date object and string
+                    date_str = r_date.isoformat() if hasattr(r_date, "isoformat") else str(r_date)
+                    if date_str not in daily:
+                        daily[date_str] = {}
+                    daily[date_str][r_kw] = r_rank
+                if daily:
+                    print(f"Loaded daily rankings for {len(daily)} dates from database.")
+                    return daily
+        except Exception as e:
+            print(f"Error loading rankings from database: {e}")
+        finally:
+            conn.close()
+
+    # Fallback to local files
+    print("Falling back to local CSV files for daily rankings...")
     if not DATA_DIR.exists():
         return daily
     
@@ -399,7 +434,7 @@ def generate_blog_draft(request: GenerateBlogRequest):
     try:
         client = anthropic.Anthropic(api_key=anthropic_key)
         # We target a stable modern Claude 3.5 model
-        model_name = request.model if request.model else "claude-3-5-sonnet-20260229"
+        model_name = request.model if request.model else "claude-sonnet-5"
         
         response = client.messages.create(
             model=model_name,
