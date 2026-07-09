@@ -399,7 +399,7 @@ button, input, select, textarea {
 /* Analyzer Dashboard Grid */
 .analyzer-grid {
     display: grid;
-    grid-template-columns: 3fr 2fr;
+    grid-template-columns: 1.2fr 1fr;
     gap: 20px;
     flex-grow: 1;
     min-height: 0;
@@ -484,12 +484,14 @@ button, input, select, textarea {
     color: var(--text-secondary);
     border-bottom: 1px solid #e1e4e9;
     z-index: 1;
+    white-space: nowrap;
 }
 
 .data-table td {
     padding: 12px 14px;
     border-bottom: 1px solid #f0f2f5;
     vertical-align: middle;
+    white-space: nowrap;
 }
 
 .data-table tr:hover td {
