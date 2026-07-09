@@ -96,7 +96,8 @@ class KeywordLinkMap(BaseModel):
 class GenerateBlogRequest(BaseModel):
     title_hint: Optional[str] = None
     keywords_with_links: List[KeywordLinkMap]
-    model: Optional[str] = "claude-3-5-sonnet-20260229"  # Use standard Claude Sonnet model name
+    model: Optional[str] = "claude-3-5-sonnet-20260229"
+    custom_prompt: Optional[str] = None
 
 # Helper functions for calculations
 def load_daily_rankings() -> Dict[str, Dict[str, int]]:
@@ -385,6 +386,9 @@ def generate_blog_draft(request: GenerateBlogRequest):
 
 위 가이드라인에 맞춰 마크다운 형식으로 한글 1,200자 ~ 1,800자 사이 분량의 본문 내용만 작성해 주세요. 대가성 문구는 최상단에 자연스럽게 노출되도록 해주세요.
 """
+
+    if request.custom_prompt and request.custom_prompt.strip():
+        prompt += f"\n\n# 사용자 추가 요청 사항 (최우선 반영할 것):\n{request.custom_prompt}\n"
 
     try:
         client = anthropic.Anthropic(api_key=anthropic_key)

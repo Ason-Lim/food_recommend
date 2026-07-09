@@ -521,6 +521,7 @@ async function generateBlogDraft() {
     
     const titleHint = document.getElementById("blog-title-input").value.trim() || null;
     const model = document.getElementById("ai-model-select").value;
+    const customPrompt = document.getElementById("blog-custom-prompt").value.trim() || null;
     
     try {
         const response = await fetch("/api/generate-blog", {
@@ -529,7 +530,8 @@ async function generateBlogDraft() {
             body: JSON.stringify({
                 title_hint: titleHint,
                 keywords_with_links,
-                model
+                model,
+                custom_prompt: customPrompt
             })
         });
         
