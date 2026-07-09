@@ -11,6 +11,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
+import psycopg2
+from psycopg2.extras import RealDictCursor
 
 # Resolve paths
 CURRENT_DIR = Path(__file__).resolve().parent
@@ -19,6 +21,42 @@ DATA_DIR = PROJECT_ROOT / "daily_food_data"
 
 # Load environment variables
 load_dotenv(dotenv_path=PROJECT_ROOT / ".env")
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+def get_db_connection():
+    if not DATABASE_URL:
+        return None
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        return conn
+    except Exception as e:
+        print(f"PostgreSQL connection error: {e}")
+        return None
+
+def init_db():
+    conn = get_db_connection()
+    if not conn:
+        print("No DATABASE_URL configured or failed to connect. Running in session-only mode.")
+        return
+    try:
+        with conn.cursor() as cur:
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS blog_history (
+                    id SERIAL PRIMARY KEY,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    title VARCHAR(255),
+                    keywords_json TEXT,
+                    links_json TEXT,
+                    content TEXT
+                );
+            """)
+            conn.commit()
+            print("PostgreSQL database tables initialized successfully.")
+    except Exception as e:
+        print(f"Error initializing database tables: {e}")
+    finally:
+        conn.close()
 
 # Import Naver DataLab Client
 sys.path.insert(0, str(PROJECT_ROOT))
@@ -31,6 +69,10 @@ except ImportError as e:
     NaverDataLabError = Exception
 
 app = FastAPI(title="Naver DataLab & Brand Connect Helper")
+
+@app.on_event("startup")
+def startup_event():
+    init_db()
 
 # CORS middleware for local testing and server configuration
 app.add_middleware(
@@ -360,6 +402,30 @@ def generate_blog_draft(request: GenerateBlogRequest):
         # Verify if disclosure is in the content
         has_disclosure = disclosure_text in content_text
         
+        # Save to DB if connection is active
+        conn = get_db_connection()
+        if conn:
+            try:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        """
+                        INSERT INTO blog_history (title, keywords_json, links_json, content)
+                        VALUES (%s, %s, %s, %s)
+                        """,
+                        (
+                            title_hint,
+                            json.dumps([item.keyword for item in request.keywords_with_links], ensure_ascii=False),
+                            json.dumps({item.keyword: item.link for item in request.keywords_with_links}, ensure_ascii=False),
+                            content_text
+                        )
+                    )
+                    conn.commit()
+                    print("Blog post saved to PostgreSQL history database.")
+            except Exception as db_err:
+                print(f"Failed to save blog post to DB: {db_err}")
+            finally:
+                conn.close()
+
         # Build checklist validation metadata
         compliance_check = {
             "has_disclosure": has_disclosure,
@@ -377,6 +443,40 @@ def generate_blog_draft(request: GenerateBlogRequest):
     except Exception as e:
         print(f"Claude API Error: {e}")
         raise HTTPException(status_code=500, detail=f"Claude API failed: {str(e)}")
+
+@app.get("/api/history")
+def get_blog_history():
+    """Fetches past generated blog posts from the PostgreSQL database."""
+    conn = get_db_connection()
+    if not conn:
+        return []
+    try:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute(
+                """
+                SELECT id, created_at, title, keywords_json, links_json, content
+                FROM blog_history
+                ORDER BY created_at DESC
+                LIMIT 50
+                """
+            )
+            rows = cur.fetchall()
+            results = []
+            for r in rows:
+                results.append({
+                    "id": r["id"],
+                    "created_at": r["created_at"].isoformat() if r["created_at"] else None,
+                    "title": r["title"],
+                    "keywords": json.loads(r["keywords_json"]) if r["keywords_json"] else [],
+                    "links": json.loads(r["links_json"]) if r["links_json"] else {},
+                    "content": r["content"]
+                })
+            return results
+    except Exception as e:
+        print(f"Failed to fetch blog history: {e}")
+        return []
+    finally:
+        conn.close()
 
 
 # Serve Static files (index.html, app.js, style.css)

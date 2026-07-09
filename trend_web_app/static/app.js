@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initTabs();
     checkApiStatus();
     initEventListeners();
+    loadBlogHistory();
     
     // Set current date
     const dateBox = document.getElementById("current-date");
@@ -538,6 +539,9 @@ async function generateBlogDraft() {
         
         // Perform compliance diagnostics
         diagnoseCompliance(data.blog_post_markdown, data.compliance);
+
+        // Reload DB History list
+        loadBlogHistory();
     } catch (e) {
         previewContainer.innerHTML = `
             <div class="preview-placeholder" style="color: var(--danger-color);">
@@ -638,4 +642,68 @@ async function copyToClipboard(mode) {
     } catch (err) {
         alert("클립보드 복사 중 실패가 발생했습니다: " + err.message);
     }
+}
+
+// 11. Database Blog History UI loading
+async function loadBlogHistory() {
+    const listContainer = document.getElementById("blog-history-list");
+    if (!listContainer) return;
+    
+    try {
+        const response = await fetch("/api/history");
+        if (!response.ok) throw new Error("히스토리 데이터 로드 실패");
+        const historyData = await response.json();
+        
+        listContainer.innerHTML = "";
+        
+        if (historyData.length === 0) {
+            listContainer.innerHTML = `<li class="history-empty">작성된 블로그 히스토리가 없습니다.</li>`;
+            return;
+        }
+        
+        // Cache history data globally
+        window.blogHistoryCache = historyData;
+        
+        historyData.forEach((item, index) => {
+            const formattedDate = item.created_at ? item.created_at.replace("T", " ").substring(0, 16) : "";
+            const li = document.createElement("li");
+            li.className = "history-item";
+            li.innerHTML = `
+                <div class="history-item-title">${item.title || "요즘 뜨는 식품 트렌드"}</div>
+                <div class="history-item-date">📅 ${formattedDate} (${item.keywords.join(", ")})</div>
+            `;
+            li.addEventListener("click", () => loadHistoryItem(index));
+            listContainer.appendChild(li);
+        });
+    } catch (e) {
+        console.error(e);
+        listContainer.innerHTML = `<li class="history-empty" style="color: var(--danger-color);">DB 연결 대기 중...</li>`;
+    }
+}
+
+function loadHistoryItem(index) {
+    const historyData = window.blogHistoryCache;
+    if (!historyData || !historyData[index]) return;
+    
+    const item = historyData[index];
+    
+    // Save to global generated post markdown state
+    window.generatedPostMarkdown = item.content;
+    
+    // Render draft
+    renderMarkdownHTML(item.content);
+    
+    // Run diagnostics
+    const disclosureText = "이 포스팅은 네이버 쇼핑 커넥트 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.";
+    const hasDisclosure = item.content.includes(disclosureText);
+    
+    diagnoseCompliance(item.content, {
+        has_disclosure: hasDisclosure,
+        disclosure_text: disclosureText,
+        advertising_policy_warning: true,
+        post_duration_warning: true,
+        penalty_system_warning: true
+    });
+    
+    alert(`"${item.title || "식품 트렌드"}" 과거 원고 초안을 불러왔습니다.`);
 }
